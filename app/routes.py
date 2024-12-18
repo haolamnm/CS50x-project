@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from app.helpers import validate_username, validate_email, validate_password
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
@@ -53,3 +53,38 @@ def register():
 		return redirect(url_for('index'))
 	else:
 		return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	session.clear()
+
+	if request.method == 'POST':
+		username = request.form['username']
+		if not username:
+			flash('Username is required')
+			return redirect(url_for('login'))
+
+		password = request.form['password']
+		if not password:
+			flash('Password is required')
+			return redirect(url_for('login'))
+
+		user = User.query.filter_by(username=username).first()
+		if user is None or not check_password_hash(user.password, password):
+			flash('Invalid username or password')
+			return redirect(url_for('login'))
+
+		session['user_id'] = user.id
+		flash('Logged in successfully', 'success')
+		return redirect(url_for('index'))
+	else:
+		return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+	session.clear()
+	flash('Logged out successfully', 'success')
+	return redirect(url_for('index'))
+

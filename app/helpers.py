@@ -1,17 +1,22 @@
 # INFO: Helper functions for the app
 from validator_collection import validators, errors
+from flask import flash, redirect, url_for, session
+from functools import wraps
+from app.models import User
 from zxcvbn import zxcvbn
 
 
 def validate_username(username: str) -> str | None:
-    username = username.strip().lower()
-    if not username:
-        return 'Username is required'
-    if not username.isalnum():
-        return 'Username must be alphanumeric'
-    if len(username) < 3 or len(username) > 100:
-        return 'Username must be between 3 and 100 characters'
-    return None
+	username = username.strip().lower()
+	if not username:
+		return 'Username is required'
+	if not username.isalnum():
+		return 'Username must be alphanumeric'
+	if len(username) < 3 or len(username) > 100:
+		return 'Username must be between 3 and 100 characters'
+	if User.query.filter_by(username=username).first():
+		return 'Username is already taken'
+	return None
 
 
 def validate_email(email: str) -> str | None:
@@ -21,6 +26,8 @@ def validate_email(email: str) -> str | None:
 		return 'Email is required'
 	except errors.InvalidEmailError:
 		return 'Email is invalid'
+	if User.query.filter_by(email=email).first():
+		return 'Email is already taken'
 	return None
 
 
@@ -36,3 +43,13 @@ def validate_password(password: str, confirmation: str) -> str | None:
 	if password != confirmation:
 		return 'Password and confirmation do not match'
 	return None
+
+
+def login_required(view):
+	@wraps(view)
+	def wrapped_view(**kwargs):
+		if 'user_id' not in session:
+			flash('Login required', 'danger')
+			return redirect(url_for('login'))
+		return view(**kwargs)
+	return wrapped_view

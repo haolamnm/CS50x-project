@@ -1,6 +1,7 @@
 import unittest
 from app.helpers import validate_username, validate_email, validate_password
 
+
 class TestHelpers(unittest.TestCase):
 	def test_validate_username(self):
 		self.assertEqual(validate_username(''), 'Username is required')
