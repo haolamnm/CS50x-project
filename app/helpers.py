@@ -11,8 +11,6 @@ def validate_username(username: str) -> str | None:
         return 'Username must be alphanumeric'
     if len(username) < 3 or len(username) > 100:
         return 'Username must be between 3 and 100 characters'
-    if " " in username or "\t" in username or "\n" in username:
-        return 'Username must be a single word'
     return None
 
 
@@ -29,12 +27,12 @@ def validate_email(email: str) -> str | None:
 def validate_password(password: str, confirmation: str) -> str | None:
 	if not password:
 		return 'Password is required'
+	if not confirmation:
+		return 'Confirmation is required'
 	if len(password) < 8:
 		return 'Password must be at least 8 characters'
 	if zxcvbn(password)['score'] < 3:
 		return 'Password is too weak'
-	if not confirmation:
-		return 'Confirmation is required'
 	if password != confirmation:
 		return 'Password and confirmation do not match'
 	return None
