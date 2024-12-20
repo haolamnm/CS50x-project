@@ -26,6 +26,8 @@ def validate_email(email: str) -> str | None:
 		return 'Email is required'
 	except errors.InvalidEmailError:
 		return 'Email is invalid'
+	if len(email) > 100:
+		return 'We do not accept emails longer than 100 characters'
 	if User.query.filter_by(email=email).first():
 		return 'Email is already taken'
 	return None

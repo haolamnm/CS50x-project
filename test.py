@@ -23,6 +23,7 @@ class TestHelpers(unittest.TestCase):
 		self.assertEqual(validate_email('invalid@invalid.c'), 'Email is invalid')
 		self.assertEqual(validate_email('invalid@@gmail.com'), 'Email is invalid')
 		self.assertEqual(validate_email('invalid@gmail..com'), 'Email is invalid')
+		self.assertEqual(validate_email('invalid' * 20 + '@gmail.com'), 'We do not accept emails longer than 100 characters')
 		self.assertEqual(validate_email('valid@gmail.com'), None)
 
 	def test_validate_password(self):

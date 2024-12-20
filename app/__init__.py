@@ -15,6 +15,12 @@ migrate = Migrate(app, db)
 
 Session(app)
 
+def username(user_id: int) -> str:
+	from app.models import User
+	user = User.query.get(user_id)
+	return user.username
+app.jinja_env.filters['username'] = username
+
 from app import routes, models
 
 # Set up console logging
