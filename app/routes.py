@@ -1,8 +1,8 @@
-from flask import render_template, flash, redirect, url_for, request, session
+from flask import current_app as app, render_template, flash, redirect, url_for, request, session
 from app.helpers import validate_username, validate_email, validate_password, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
-from app import app, db
+from app import db
 
 
 @app.after_request
