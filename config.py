@@ -19,6 +19,11 @@ class Config:
 	SESSION_PERMANENT = False
 
 
+class TestConfig(Config):
+	TESTING = True
+	SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+
+
 if __name__ == '__main__':
 	print('--- Configurations ---')
 	print(Config.SQLALCHEMY_DATABASE_URI)
