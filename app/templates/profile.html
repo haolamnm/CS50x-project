@@ -53,11 +53,16 @@ Profile
 		<!-- Update Username Form -->
 		<div class="tab-pane fade show active" id="username-form-update" role="tabpanel">
 			<form action="/update" method="post">
+				<input type="hidden" name="update_type" value="username_update">
+
+				<!-- For New Username -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="person-circle-outline"></ion-icon></span>
 					<input autocomplete="off" class="form-control" name="new_username" placeholder="New Username"
 						type="text" required>
 				</div>
+
+				<!-- For Password -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
@@ -74,11 +79,16 @@ Profile
 		<!-- Update Email Form -->
 		<div class="tab-pane fade" id="email-form-update" role="tabpanel">
 			<form action="/update" method="post">
+				<input type="hidden" name="update_type" value="email_update">
+
+				<!-- For New Email -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
 					<input autocomplete="off" class="form-control" name="new_email" placeholder="New Email" type="email"
 						required>
 				</div>
+
+				<!-- For Password -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
@@ -95,6 +105,9 @@ Profile
 		<!-- Update Password Form -->
 		<div class="tab-pane fade" id="password-form-update" role="tabpanel">
 			<form action="/update" method="post">
+				<input type="hidden" name="update_type" value="password_update">
+
+				<!-- For New Password -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 					<input autocomplete="off" class="form-control password-toggle" name="new_password"
@@ -104,6 +117,8 @@ Profile
 						<ion-icon name="eye-off"></ion-icon>
 					</button>
 				</div>
+
+				<!-- For New Password Confirmation -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle"
@@ -113,6 +128,8 @@ Profile
 						<ion-icon name="eye-off"></ion-icon>
 					</button>
 				</div>
+
+				<!-- For Password -->
 				<div class="mb-3 input-group">
 					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"

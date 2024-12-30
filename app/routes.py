@@ -121,3 +121,51 @@ def profile():
 @login_required
 def timer():
 	return render_template('timer.html')
+
+
+@app.route('/update', methods=['POST'])
+@login_required
+def update():
+	update_type = request.form['update_type']
+
+	password = request.form['password']
+	user = User.query.get(session['user_id'])
+
+	if not check_password_hash(user.password, password):
+		flash('Invalid password', 'warning')
+		return redirect(url_for('profile'))
+
+	if update_type == 'username_update':
+		new_username = request.form['new_username'].strip().lower()
+		new_username_error = validate_username(new_username)
+		if new_username_error:
+			flash(new_username_error, 'warning')
+			return redirect(url_for('profile'))
+		user.username = new_username
+
+	elif update_type == 'email_update':
+		new_email = request.form['new_email'].strip()
+		new_email_error = validate_email(new_email)
+		if new_email_error:
+			flash(new_email_error, 'warning')
+			return redirect(url_for('profile'))
+		user.email = new_email
+
+	elif update_type == 'password_update':
+		new_password = request.form['new_password']
+		new_confirmation = request.form['new_confirmation']
+		new_password_error = validate_password(new_password, new_confirmation)
+		if new_password_error:
+			flash(new_password_error, 'warning')
+			return redirect(url_for('profile'))
+		user.password = generate_password_hash(new_password, salt_length=16)
+
+	try:
+		db.session.commit()
+		flash('Profile updated successfully', 'success')
+	except Exception as e:
+		db.session.rollback()
+		flash('An error occurred', 'danger')
+		print(e)
+
+	return redirect(url_for('profile'))
