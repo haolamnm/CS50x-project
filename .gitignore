@@ -1,0 +1,20 @@
+# Byte-compiled
+__pycache__/
+*.pyc
+*.py[cod]
+
+# Flask-Session
+flask_session/
+
+# Flask-SQLAlchemy
+migrations/
+instance/
+
+# Environment
+.env
+.venv
+env/
+venv/
+
+# VSCode
+.vscode/

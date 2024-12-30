@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block main %}
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
+	<h3 class="text-light">Welcome mate!</h3>
+	<form action="/register" method="post">
+
+		<!-- For Username -->
+		<div class="mb-3 mt-3 input-group">
+			<span class="input-group-text"><ion-icon name="person-circle-outline"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="username" placeholder="Username"
+				type="text" autofocus required>
+		</div>
+
+		<!-- For Email -->
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email"
+				type="email" required>
+		</div>
+
+		<!-- For Password -->
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+				placeholder="Password" type="password" required>
+			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+				onclick="togglePasswordVisibility(this)">
+				<ion-icon name="eye-off"></ion-icon>
+			</button>
+		</div>
+
+		<!-- For Password Confirmation -->
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="confirmation"
+				placeholder="Password (again)" type="password" required>
+			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+				onclick="togglePasswordVisibility(this)">
+				<ion-icon name="eye-off"></ion-icon>
+			</button>
+		</div>
+
+		<!-- Log In Text -->
+		<div class="mb-3">
+			<p class="text-center">Already have an account? <a href="/login">Log In</a></p>
+		</div>
+
+		<!-- Register Button -->
+		<button class="btn btn-primary mb-3" type="submit">Register</button>
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<!-- Basic Meta tags -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="haolamnm">
+	<meta name="robots" content="index, follow">
+	<meta name="application-name" content="Pomodoro 50">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="keywords" content="Pomodoro, Pomodoro 50, Timer, CS50x">
+	<meta name="description"
+		content="Pomodoro 50 | A web app for time management using the Pomodoro Technique. Stay focused and boost productivity.">
+	<meta name="theme-color" content="#212529">
+
+
+	<!-- Open Graph protocols -->
+	<meta property="og:title" content="Pomodoro 50">
+	<meta property="og:description"
+		content="Pomodoro 50 | A web app for time management using the Pomodoro Technique. Stay focused and boost productivity.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://pomodoro50.vercal.app">
+	<meta property="og:image" content="\static\img\preview.png">
+
+
+	<!-- Link to Bootstrap v5.3.3 -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+
+
+	<!-- Link to Favicon -->
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
+	<link rel="manifest" href="/static/ico/site.webmanifest">
+
+
+	<!-- Link to Font Awesome v6.0.0 -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+	<!-- Link to internal CSS -->
+	<link rel="stylesheet" href="/static/css/styles.css">
+
+
+	<!-- Link to Google Font -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap" rel="stylesheet">
+
+
+	<!-- Link to Ionicons v5.5.2 -->
+	<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+
+
+	<!-- Link to Calendar Heatmap -->
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+	<link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+
+
+	<!-- Link to internal JavaScript -->
+	<script src="/static/js/helpers.js"></script>
+	<script src="/static/js/progress.js"></script>
+
+	<title>
+		{% block title %}
+		{% endblock %}
+	</title>
+</head>
+
+<body data-bs-theme="dark">
+
+	<!-- Navigation bar section -->
+	<nav class="bg-dark navbar-dark border navbar navbar-expand-md fixed-top" id="navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/"><span class="red">Pomodoro 50</span></a>
+			<button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+				data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbar">
+				{% if session["user_id"] %}
+				<ul class="navbar-nav me-auto mt-2">
+					<li class="nav-item"><a class="nav-link" href="/timer">Timer</a></li>
+					<li class="nav-item"><a class="nav-link" href="/statistic">Statistic</a></li>
+					<li class="nav-item"><a class="nav-link" href="/history">History</a></li>
+					<li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+				</ul>
+				<ul class="navbar-nav ms-auto mt-2">
+					<li class="nav-item"><a class="nav-link" href="/profile">{{ session["username"] }}</a></li>
+					<li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+				</ul>
+				{% else %}
+				<ul class="navbar-nav ms-auto mt-2">
+					<li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+					<li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+				</ul>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+
+	<!-- Flash messages section -->
+	{% if get_flashed_messages() %}
+	<header class="container">
+		<div id="flash-message" class="alert alert-primary mb-0 text-center" role="alert">
+			{{ get_flashed_messages() | join(" ") }}
+		</div>
+	</header>
+	{% endif %}
+
+
+	<!-- Main content section -->
+	<main class="container text-center" id="main">
+		{% block main %}
+		{% endblock %}
+	</main>
+
+
+	<!-- Footer content section -->
+	<footer class="bg-dark text-light border shadow-sm">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 mt-3 text-center">
+					<ul class="list-inline mb-1 fs-6">
+						<li class="list-inline-item">
+							<a class="text-light" href="https://www.linkedin.com/in/haolamnm/" target="_blank">
+								<i class="fab fa-linkedin"></i>
+							</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="text-light" href="https://github.com/haolamnm/CS50x-project" target="_blank">
+								<i class="fab fa-github"></i>
+							</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="text-light" href="mailto:haolamnm.work@gmail.com" target="_blank">
+								<i class="fas fa-envelope"></i>
+							</a>
+						</li>
+					</ul>
+					<p class="mb-0 text-secondary">© 2024 haolamnm</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+</body>
+
+</html>

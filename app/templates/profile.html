@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block main %}
+<!-- For Profile section -->
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
+	<div class="d-flex align-items-center">
+		<div class="p-2">
+			<img src="{{ url_for('static', filename='img/default.png') }}" class="img-fluid rounded-circle"
+				alt="Profile Image" style="width: 120px; height: 120px;">
+		</div>
+		<div class="p-2 pb-3">
+			<h3 class="text-light text-start">{{ session["username"] }}</h3>
+			<p class="text-secondary">{{ session["email"] }}</p>
+		</div>
+	</div>
+</div>
+
+<!-- For Progress Tracker section -->
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3 mt-3">
+	<h3 class="text-light">Progess Tracker</h3>
+	<div id="cal-heatmap" class="mx-auto"></div>
+</div>
+
+<!-- For Edit Profile section -->
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3 mt-3">
+	<h3 class="text-light">Edit Profile</h3>
+	<ul class="nav nav-tabs" role="tablist">
+
+		<!-- Change Username Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active" id="username-tab-update" data-bs-toggle="tab"
+				data-bs-target="#username-form-update" type="button" role="tab">Username</button>
+		</li>
+
+		<!-- Change Email Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="email-tab-update" data-bs-toggle="tab" data-bs-target="#email-form-update"
+				type="button" role="tab">Email</button>
+		</li>
+
+		<!-- Change Password Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="password-tab-update" data-bs-toggle="tab"
+				data-bs-target="#password-form-update" type="button" role="tab">Password</button>
+		</li>
+	</ul>
+
+	<div class="tab-content mt-3">
+		<!-- Update Username Form -->
+		<div class="tab-pane fade show active" id="username-form-update" role="tabpanel">
+			<form action="/update" method="post">
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="person-circle-outline"></ion-icon></span>
+					<input autocomplete="off" class="form-control" name="new_username" placeholder="New Username"
+						type="text" required>
+				</div>
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+						placeholder="Password" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<ion-icon name="eye-off"></ion-icon>
+					</button>
+				</div>
+				<button class="btn btn-primary" type="submit">Update</button>
+			</form>
+		</div>
+
+		<!-- Update Email Form -->
+		<div class="tab-pane fade" id="email-form-update" role="tabpanel">
+			<form action="/update" method="post">
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+					<input autocomplete="off" class="form-control" name="new_email" placeholder="New Email" type="email"
+						required>
+				</div>
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+						placeholder="Password" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<ion-icon name="eye-off"></ion-icon>
+					</button>
+				</div>
+				<button class="btn btn-primary" type="submit">Update</button>
+			</form>
+		</div>
+
+		<!-- Update Password Form -->
+		<div class="tab-pane fade" id="password-form-update" role="tabpanel">
+			<form action="/update" method="post">
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<input autocomplete="off" class="form-control password-toggle" name="new_password"
+						placeholder="New Password" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<ion-icon name="eye-off"></ion-icon>
+					</button>
+				</div>
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle"
+						name="new_confirmation" placeholder="New Password (again)" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<ion-icon name="eye-off"></ion-icon>
+					</button>
+				</div>
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+						placeholder="Password" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<ion-icon name="eye-off"></ion-icon>
+					</button>
+				</div>
+				<button class="btn btn-primary" type="submit">Update</button>
+			</form>
+		</div>
+
+	</div>
+</div>
+
+<!-- For Customization section -->
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3 mt-3">
+	<h3 class="text-light">Customization</h3>
+</div>
+{% endblock %}
