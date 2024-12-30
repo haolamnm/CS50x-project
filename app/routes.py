@@ -31,20 +31,20 @@ def register():
 		username = request.form['username'].strip().lower()
 		username_error = validate_username(username)
 		if username_error:
-			flash(username_error)
+			flash(username_error, 'warning')
 			return redirect(url_for('register'))
 
 		email = request.form['email'].strip()
 		email_error = validate_email(email)
 		if email_error:
-			flash(email_error)
+			flash(email_error, 'warning')
 			return redirect(url_for('register'))
 
 		password = request.form['password']
 		confirmation = request.form['confirmation']
 		password_error = validate_password(password, confirmation)
 		if password_error:
-			flash(password_error)
+			flash(password_error, 'warning')
 			return redirect(url_for('register'))
 
 		user = User(
@@ -65,19 +65,31 @@ def login():
 
 	if request.method == 'POST':
 		session.clear()
-		username = request.form['username'].strip().lower()
-		if not username:
-			flash('Username is required')
-			return redirect(url_for('login'))
+		login_type = request.form['login_type']
+
+		user = None
+
+		if login_type == 'username_login':
+			username = request.form['username'].strip().lower()
+			if not username:
+				flash('Username is required', 'warning')
+				return redirect(url_for('login'))
+			user = User.query.filter_by(username=username).first()
+
+		elif login_type == 'email_login':
+			email = request.form['email'].strip()
+			if not email:
+				flash('Email is required', 'warning')
+				return redirect(url_for('login'))
+			user = User.query.filter_by(email=email).first()
 
 		password = request.form['password']
 		if not password:
-			flash('Password is required')
+			flash('Password is required', 'warning')
 			return redirect(url_for('login'))
 
-		user = User.query.filter_by(username=username).first()
 		if user is None or not check_password_hash(user.password, password):
-			flash('Invalid username or password')
+			flash('Invalid credentials', 'warning')
 			return redirect(url_for('login'))
 
 		session['user_id'] = user.id
