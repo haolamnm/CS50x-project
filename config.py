@@ -17,6 +17,7 @@ class Config:
 	SESSION_TYPE = 'filesystem'
 	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
 	SESSION_PERMANENT = False
+	SESSION_USER_SIGNER = True
 
 
 class TestConfig(Config):

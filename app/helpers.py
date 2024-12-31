@@ -1,4 +1,3 @@
-# INFO: Helper functions for the app
 from validator_collection import validators, errors
 from flask import flash, redirect, url_for, session
 from functools import wraps
@@ -12,8 +11,10 @@ def validate_username(username: str) -> str | None:
 		return 'Username is required'
 	if not username.isalnum():
 		return 'Username must be alphanumeric'
-	if len(username) < 3 or len(username) > 100:
-		return 'Username must be between 3 and 100 characters'
+	if len(username) < 3:
+		return 'Username must be at least 3 characters'
+	if len(username) > 100:
+		return 'Username is too long'
 	if User.query.filter_by(username=username).first():
 		return 'Username is already taken'
 	return None
@@ -27,7 +28,7 @@ def validate_email(email: str) -> str | None:
 	except errors.InvalidEmailError:
 		return 'Email is invalid'
 	if len(email) > 100:
-		return 'We do not accept emails longer than 100 characters'
+		return 'Email is too long'
 	if User.query.filter_by(email=email).first():
 		return 'Email is already taken'
 	return None
@@ -56,7 +57,12 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
+            flash('Please login to access this page', 'warning')
             return redirect("/login")
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+if __name__ == '__main__':
+	print(validate_email('valid@gmail.com'))

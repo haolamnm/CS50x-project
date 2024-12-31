@@ -1,9 +1,9 @@
 import logging
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from config import Config
 from flask_migrate import Migrate
 from flask_session import Session
-from config import Config
+from flask_sqlalchemy import SQLAlchemy
 
 
 db = SQLAlchemy()
@@ -22,8 +22,8 @@ def create_app(config_class=Config):
 		from app import routes, models
 		db.create_all()
 
-	# Set up console logging
-	if not app.debug:
+	# INFO: Set up console logging
+	if not app.debug and not app.testing:
 		stream_handler = logging.StreamHandler()
 		stream_handler.setLevel(logging.INFO)
 		app.logger.addHandler(stream_handler)
