@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 
@@ -9,7 +9,7 @@ class User(db.Model):
 	username = db.Column(db.String(100), nullable=False, unique=True)
 	email = db.Column(db.String(100), nullable=False, unique=True)
 	password = db.Column(db.String(255), nullable=False, unique=False)
-	created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, unique=False)
+	created = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
 
 
 class Activity(db.Model):
@@ -18,4 +18,4 @@ class Activity(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 	goal = db.Column(db.String(100), nullable=False)
-	created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, unique=False)
+	created = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
