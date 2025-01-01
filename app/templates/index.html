@@ -1,13 +1,12 @@
 {% extends "layout.html" %}
 
 {% block title %}
-	Home
+Home
 {% endblock %}
 
 {% block main %}
-	<h1>Welcome {{ session["username"] }} to Pomodoro 50</h1>
-	<p>Here you can track your work and break time using the Pomodoro Technique.</p>
-	<p>Click the button below to start the timer.</p>
-	<a class="btn btn-primary" href="/timer">Start Timer</a>
-
+<h1>Welcome {{ session["username"] }} to Pomodoro 50</h1>
+<p>Here you can track your work and break time using the Pomodoro Technique.</p>
+<p>Click the button below to start the timer.</p>
+<a class="btn btn-primary" href="/timer">Start Timer</a>
 {% endblock %}
