@@ -21,10 +21,11 @@ def validate_username(username: str) -> str | None:
 
 
 def validate_email(email: str) -> str | None:
-	try:
-		email = validators.email(email).strip()
-	except errors.EmptyValueError:
+	email = email.strip()
+	if not email:
 		return 'Email is required'
+	try:
+		validators.email(email)
 	except errors.InvalidEmailError:
 		return 'Email is invalid'
 	if len(email) > 100:
