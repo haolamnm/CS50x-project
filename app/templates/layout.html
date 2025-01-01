@@ -109,13 +109,19 @@
 
 
 	<!-- Flash messages section -->
-	{% if get_flashed_messages() %}
-	<header class="container">
-		<div id="flash-message" class="alert alert-primary mb-0 text-center" role="alert">
-			{{ get_flashed_messages() | join(" ") }}
-		</div>
-	</header>
-	{% endif %}
+	{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		<header class="container">
+			<div id="flash-message">
+				{% for category, message in messages %}
+					<div class="alert alert-{{ category }} mb-0 text-center" role="alert">
+						{{ message }}
+					</div>
+				{% endfor %}
+			</div>
+		</header>
+		{% endif %}
+	{% endwith %}
 
 
 	<!-- Main content section -->
