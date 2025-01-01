@@ -16,6 +16,9 @@ Log In
 			<button class="nav-link" id="email-tab-login" data-bs-toggle="tab" data-bs-target="#email-form-login"
 				type="button" role="tab">Email</button>
 		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="google-tab-login" data-bs-toggle="tab" data-bs-target="#other-form-login" type="button" role="tab">Other</button>
+		</li>
 	</ul>
 
 	<!-- Log In by Username Form -->
@@ -83,5 +86,21 @@ Log In
 			</form>
 		</div>
 	</div>
+
+	<!-- Log In by Other Form -->
+	<div class="tab-content mt-3">
+		<div class="tab-pane fade" id="other-form-login" role="tabpanel">
+			<form action="{{ url_for('main.login_google') }}" method="get">
+
+				<!-- For Google -->
+				<div class="mb-3 input-group">
+					<button class="btn btn-outline-danger w-100" type="submit">
+						<ion-icon name="logo-google"></ion-icon> Log In with Google
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
 </div>
 {% endblock %}

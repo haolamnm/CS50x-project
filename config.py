@@ -19,6 +19,10 @@ class Config:
 	SESSION_PERMANENT = False
 	SESSION_USER_SIGNER = True
 
+	# OAuth configuration
+	GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+	GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+
 
 class TestConfig(Config):
 	TESTING = True

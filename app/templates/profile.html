@@ -13,7 +13,7 @@ Profile
 				alt="Profile Image" style="width: 120px; height: 120px;">
 		</div>
 		<div class="p-2 pb-3">
-			<h3 class="text-light text-start">{{ session["username"] }}</h3>
+			<h3 class="text-light text-start">{{ session["username"] if session["username"] else "user" }}</h3>
 			<p class="text-secondary">{{ session["email"] }}</p>
 		</div>
 	</div>

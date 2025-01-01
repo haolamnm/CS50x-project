@@ -94,7 +94,7 @@
 					<li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
 				</ul>
 				<ul class="navbar-nav ms-auto mt-2">
-					<li class="nav-item"><a class="nav-link" href="/profile">{{ session["username"] }}</a></li>
+					<li class="nav-item"><a class="nav-link" href="/profile">{{ session["username"] if session["username"] else "user" }}</a></li>
 					<li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
 				</ul>
 				{% else %}

@@ -65,5 +65,12 @@ def login_required(f):
     return decorated_function
 
 
-if __name__ == '__main__':
-	print(validate_email('valid@gmail.com'))
+def profile_completed_required(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		user = User.query.get(session['user_id'])
+		if user and (user.username is None or user.email is None or user.password is None):
+			flash('Please complete your profile before proceeding', 'warning')
+			return redirect(url_for('main.profile_complete'))
+		return f(*args, **kwargs)
+	return decorated_function

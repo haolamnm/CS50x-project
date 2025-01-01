@@ -1,11 +1,26 @@
 from flask import current_app as app, render_template, flash, redirect, url_for, request, session, Blueprint
-from app.helpers import validate_username, validate_email, validate_password, login_required
+from app.helpers import validate_username, validate_email, validate_password, login_required, profile_completed_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
 from app import db
+from authlib.integrations.flask_client import OAuth # type: ignore
+import uuid
 
 
 main = Blueprint('main', __name__)
+
+
+oauth = OAuth(app)
+
+google = oauth.register(
+    name='google',
+    client_id=app.config['GOOGLE_CLIENT_ID'],
+    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
+)
 
 
 @main.after_request
@@ -55,6 +70,8 @@ def register():
 		session['user_id'] = user.id
 		session['username'] = user.username
 		session['email'] = user.email
+		session['oauth_provider'] = user.oauth_provider
+
 		flash('User registered successfully', 'success')
 		return redirect(url_for('main.index'))
 	else:
@@ -98,6 +115,8 @@ def login():
 		session['user_id'] = user.id
 		session['username'] = user.username
 		session['email'] = user.email
+		session['oauth_provider'] = user.oauth_provider
+
 		flash('Logged in successfully', 'success')
 		return redirect(url_for('main.index'))
 	else:
@@ -106,16 +125,16 @@ def login():
 
 @main.route('/logout')
 @login_required
+@profile_completed_required
 def logout():
-	session.pop('user_id', None)
-	session.pop('username', None)
-	session.pop('email', None)
+	session.clear()
 	flash('Logged out successfully', 'success')
 	return redirect(url_for('main.index'))
 
 
 @main.route('/profile')
 @login_required
+@profile_completed_required
 def profile():
 	user = User.query.get(session['user_id'])
 	return render_template('profile.html', user=user)
@@ -123,12 +142,14 @@ def profile():
 
 @main.route('/timer')
 @login_required
+@profile_completed_required
 def timer():
 	return render_template('timer.html')
 
 
 @main.route('/update', methods=['POST'])
 @login_required
+@profile_completed_required
 def update():
 	update_type = request.form['update_type']
 	if update_type not in ['username_update', 'email_update', 'password_update']:
@@ -182,3 +203,122 @@ def update():
 		print(e)
 
 	return redirect(url_for('main.profile'))
+
+
+@main.route('/login/google')
+def login_google():
+	try:
+		redirect_uri = url_for('main.authorize_google', _external=True)
+		return google.authorize_redirect(redirect_uri)
+	except Exception as e:
+		flash('An error occurred during login', 'danger')
+		print(e)
+		return redirect(url_for('main.login'))
+
+
+@main.route('/authorize/google')
+def authorize_google():
+	try:
+		token = google.authorize_access_token()
+		userinfo_endpoint = google.server_metadata['userinfo_endpoint']
+		response = google.get(userinfo_endpoint)
+		userinfo = response.json()
+
+		email = userinfo['email']
+		oauth_id = userinfo['sub']
+		oauth_provider = 'google'
+
+		user = User.query.filter_by(email=email).first()
+		updated = False
+
+		if not user:
+			username = userinfo['email'].split('@')[0]
+			username_error = validate_username(username)
+			if username_error:
+				username = 'user_' + str(uuid.uuid4().hex[:8])
+			user = User(
+				username=None,
+				email=email,
+				password=None,
+				oauth_provider=oauth_provider,
+				oauth_id=oauth_id
+			)
+			db.session.add(user)
+			updated = True
+		elif user.oauth_provider != oauth_provider or user.oauth_id != oauth_id:
+			user.oauth_provider = oauth_provider
+			user.oauth_id = oauth_id
+			updated = True
+
+		if updated:
+			db.session.commit()
+
+		session['user_id'] = user.id
+		session['username'] = user.username
+		session['email'] = user.email
+		session['oauth_provider'] = oauth_provider
+		session['oauth_id'] = oauth_id
+
+		flash('Logged in successfully', 'success')
+		return redirect(url_for('main.index'))
+
+	except Exception as e:
+		flash('An error occurred during authorization', 'danger')
+		print(e)
+		return redirect(url_for('main.login'))
+
+
+@main.route('/profile/complete', methods=['GET', 'POST'])
+@login_required
+def profile_complete():
+	user = User.query.get(session['user_id'])
+
+	if user.username is not None and user.email is not None and user.password is not None:
+		flash('Profile already completed', 'info')
+		return redirect(url_for('main.profile'))
+
+	elif request.method == 'POST':
+		updated = False
+
+		if user.username is None or user.username == '':
+			username = request.form['username'].strip().lower()
+			username_error = validate_username(username)
+			if username_error:
+				flash(username_error, 'warning')
+				return redirect(url_for('main.profile_complete'))
+
+			user.username = username
+			updated = True
+
+		if user.email is None or user.email == '':
+			email = request.form['email'].strip()
+			email_error = validate_email(email)
+			if email_error:
+				flash(email_error, 'warning')
+				return redirect(url_for('main.profile_complete'))
+
+			user.email = email
+			updated = True
+
+		if user.password is None or user.password == '':
+			password = request.form['password']
+			confirmation = request.form['confirmation']
+			password_error = validate_password(password, confirmation)
+			if password_error:
+				flash(password_error, 'warning')
+				return redirect(url_for('main.profile_complete'))
+
+			user.password = generate_password_hash(password, salt_length=16)
+			updated = True
+
+		if updated:
+			db.session.commit()
+
+			session['username'] = user.username
+			session['email'] = user.email
+			session['oauth_provider'] = user.oauth_provider
+			
+			flash('Profile updated successfully', 'success')
+			return redirect(url_for('main.profile'))
+	else:
+		return render_template('profile_complete.html', user=user)

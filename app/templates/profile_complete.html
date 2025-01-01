@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Complete Profile
+{% endblock %}
+
+{% block main %}
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
+	<h3>Complete your Info</h3>
+	<form action="/profile/complete" method="post">
+
+		<!-- For Username -->
+		{% if user.username is none or user.username == "" %}
+		<div class="mb-3 mt-3 input-group">
+			<span class="input-group-text"><ion-icon name="person-circle-outline"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="username" placeholder="Username"
+				type="text" autofocus required>
+		</div>
+		{% endif %}
+
+		<!-- For Email -->
+		{% if user.email is none or user.email == "" %}
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email"
+				type="email" required>
+		</div>
+		{% endif %}
+
+		<!-- For Password -->
+		{% if user.password is none or user.password == "" %}
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+				placeholder="Password" type="password" required>
+			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+				onclick="togglePasswordVisibility(this)">
+				<ion-icon name="eye-off"></ion-icon>
+			</button>
+		</div>
+		{% endif %}
+
+		<!-- For Password Confirmation -->
+		{% if user.password is none or user.password == "" %}
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="confirmation"
+				placeholder="Password (again)" type="password" required>
+			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+				onclick="togglePasswordVisibility(this)">
+				<ion-icon name="eye-off"></ion-icon>
+			</button>
+		</div>
+		{% endif %}
+
+		<button class="btn btn-primary" type="submit">Complete</button>
+</div>
+{% endblock %}
