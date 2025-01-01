@@ -1,5 +1,5 @@
 import logging
-from flask import Flask
+from flask import Flask, flash, render_template
 from config import Config
 from flask_migrate import Migrate
 from flask_session import Session
@@ -30,5 +30,13 @@ def create_app(config_class=Config):
 
 	app.logger.setLevel(logging.INFO)
 	app.logger.info('Flask App startup')
+
+	from app.routes import main as main_blueprint
+	app.register_blueprint(main_blueprint)
+
+	@app.errorhandler(404)
+	def page_not_found(e):
+		flash('Page not found', 'danger')
+		return render_template('404.html'), 404
 
 	return app
