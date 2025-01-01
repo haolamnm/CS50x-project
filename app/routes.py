@@ -274,12 +274,10 @@ def profile_complete():
 	user = User.query.get(session['user_id'])
 
 	if user.username is not None and user.email is not None and user.password is not None:
-		flash('Profile already completed', 'info')
+		flash('Profile is already complete', 'info')
 		return redirect(url_for('main.profile'))
 
 	elif request.method == 'POST':
-		updated = False
-
 		if user.username is None or user.username == '':
 			username = request.form['username'].strip().lower()
 			username_error = validate_username(username)
@@ -288,7 +286,6 @@ def profile_complete():
 				return redirect(url_for('main.profile_complete'))
 
 			user.username = username
-			updated = True
 
 		if user.email is None or user.email == '':
 			email = request.form['email'].strip()
@@ -298,7 +295,6 @@ def profile_complete():
 				return redirect(url_for('main.profile_complete'))
 
 			user.email = email
-			updated = True
 
 		if user.password is None or user.password == '':
 			password = request.form['password']
@@ -309,16 +305,15 @@ def profile_complete():
 				return redirect(url_for('main.profile_complete'))
 
 			user.password = generate_password_hash(password, salt_length=16)
-			updated = True
 
-		if updated:
-			db.session.commit()
+		db.session.commit()
 
-			session['username'] = user.username
-			session['email'] = user.email
-			session['oauth_provider'] = user.oauth_provider
-			
-			flash('Profile updated successfully', 'success')
-			return redirect(url_for('main.profile'))
+		session['username'] = user.username
+		session['email'] = user.email
+		session['oauth_provider'] = user.oauth_provider
+
+		flash('Profile updated successfully', 'success')
+		return redirect(url_for('main.profile'))
+
 	else:
 		return render_template('profile_complete.html', user=user)

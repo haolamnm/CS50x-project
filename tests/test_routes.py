@@ -81,8 +81,8 @@ class TestRoutes(unittest.TestCase):
         return response
 
 
-    def get(self, url):
-        response = self.client.get(url)
+    def get(self, route, follow_redirects: bool=False):
+        response = self.client.get(route, follow_redirects=follow_redirects)
         return response
 
     def check_status_code(self, response, status_code):
@@ -118,6 +118,8 @@ class TestRoutes(unittest.TestCase):
         self.assertTrue(check_password_hash(user.password, password))
         return user
 
+    def check_route(self, response, route):
+        self.assertIn(route, response.headers['Location'])
 
     def test_home(self):
         response = self.get('/')
@@ -280,6 +282,7 @@ class TestRoutes(unittest.TestCase):
             if expected == 302:
                 self.check_title(response, 'Log In')
                 self.check_flash(response, 'Please log in to access this page', 'warning')
+                self.check_route(response, '/login')
 
 
     def test_profile(self):
@@ -560,6 +563,63 @@ class TestRoutes(unittest.TestCase):
 
     # def test_bad_request(self):
     #     pass
+
+
+    def test_login_with_google(self):
+        response = self.get('/login/google')
+        self.check_status_code(response, 302) # Redirect to Google login page
+        self.check_route(response, 'https://accounts.google.com/o/oauth2/v2/auth')
+
+
+    def test_profile_completed_required_with_incompleted_profile(self):
+        for username, email, password in PROFILE_COMPLETED_REQUIRED_TEST_CASES:
+            user = User(
+                username=username,
+                email=email,
+                password=generate_password_hash(password, salt_length=16) if password else None
+            )
+            db.session.add(user)
+            db.session.commit()
+
+            # INFO: Simulate login
+            with self.client.session_transaction() as session:
+                session['user_id'] = user.id
+                session['username'] = user.username
+                session['email'] = user.email
+                session['oauth_provider'] = user.oauth_provider
+
+            for route, _ in LOGIN_REQUIRED_TEST_CASES:
+                response = self.get(route)
+                self.check_status_code(response, 302)
+                self.check_route(response, '/profile/complete')
+
+                response = self.get(route, follow_redirects=True)
+                self.check_status_code(response, 200)
+                self.check_title(response, 'Profile Completion')
+                self.check_flash(response, 'Please complete your profile before proceeding', 'warning')
+
+            with self.client.session_transaction() as session:
+                session.clear()
+
+            db.session.delete(user)
+            db.session.commit()
+
+    def test_profile_completed_requriement_with_completed_profile(self):
+        response = self.login(
+            login_type='username_login',
+            identifier=self.test_username,
+            password=self.test_password
+        )
+        self.check_status_code(response, 200)
+
+        response = self.get('/profile/complete')
+        self.check_status_code(response, 302)
+        self.check_route(response, '/profile')
+
+        response = self.get('/profile', follow_redirects=True)
+        self.check_status_code(response, 200)
+        self.check_title(response, 'Profile')
+        self.check_flash(response, 'Profile is already complete', 'info')
 
 
 if __name__ == '__main__':
