@@ -19,3 +19,6 @@ venv/
 
 # VSCode
 .vscode/
+
+# Pytest
+.pytest_cache/
