@@ -22,6 +22,20 @@ google = oauth.register(
     }
 )
 
+github = oauth.register(
+	name='github',
+	client_id=app.config['GITHUB_CLIENT_ID'],
+	client_secret=app.config['GITHUB_CLIENT_SECRET'],
+	access_token_url='https://github.com/login/oauth/access_token',
+	access_token_params=None,
+	authorize_url='https://github.com/login/oauth/authorize',
+	authorize_params=None,
+	api_base_url='https://api.github.com/',
+	client_kwargs={
+		'scope': 'user:email'
+	}
+)
+
 
 @main.after_request
 def after_request(response: object) -> object:
@@ -211,12 +225,12 @@ def login_google() -> str:
 		redirect_uri = url_for('main.authorize_google', _external=True)
 		return google.authorize_redirect(redirect_uri)
 	except Exception as e:
-		flash('An error occurred during login', 'danger')
+		flash('An error occurred during login with Google', 'danger')
 		print(e)
 		return redirect(url_for('main.login'))
 
 
-@main.route('/authorize/google', methods=['GET'])
+@main.route('/login/google/authorize', methods=['GET'])
 def authorize_google() -> str:
 	try:
 		token = google.authorize_access_token()
@@ -263,7 +277,64 @@ def authorize_google() -> str:
 		return redirect(url_for('main.index'))
 
 	except Exception as e:
-		flash('An error occurred during authorization', 'danger')
+		flash('Error occurred during authorization with Google', 'danger')
+		print(e)
+		return redirect(url_for('main.login'))
+
+
+@main.route('/login/github', methods=['GET'])
+def login_github() -> str:
+	try:
+		redirect_uri = url_for('main.authorize_github', _external=True)
+		return github.authorize_redirect(redirect_uri)
+	except Exception as e:
+		flash('Error occurred during login with GitHub', 'danger')
+		print(e)
+		return redirect(url_for('main.login'))
+
+
+@main.route('/login/github/authorize', methods=['GET'])
+def authorize_github() -> str:
+	try:
+		token = github.authorize_access_token()
+		response = github.get('user').json()
+		email = response['email']
+		username = response['login']
+		oauth_id = response['id']
+		oauth_provider = 'github'
+
+		user = User.query.filter_by(email=email).first()
+		updated = False
+
+		if not user:
+			user = User(
+				username=username,
+				email=email,
+				password=None,
+				oauth_provider=oauth_provider,
+				oauth_id=oauth_id
+			)
+			db.session.add(user)
+			updated = True
+		elif user.oauth_provider != oauth_provider or user.oauth_id != oauth_id:
+			user.oauth_provider = oauth_provider
+			user.oauth_id = oauth_id
+			updated = True
+
+		if updated:
+			db.session.commit()
+
+		session['user_id'] = user.id
+		session['username'] = user.username
+		session['email'] = user.email
+		session['oauth_provider'] = oauth_provider
+		session['oauth_id'] = oauth_id
+
+		flash('Logged in successfully', 'success')
+		return redirect(url_for('main.index'))
+
+	except Exception as e:
+		flash('Error occurred during authorization with GitHub', 'danger')
 		print(e)
 		return redirect(url_for('main.login'))
 

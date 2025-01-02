@@ -19,9 +19,13 @@ class Config:
 	SESSION_PERMANENT = False
 	SESSION_USER_SIGNER = True
 
-	# OAuth configuration
+	# Google OAuth configuration
 	GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 	GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+
+	# Github OAuth configuration
+	GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
+	GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 
 
 class TestConfig(Config):
