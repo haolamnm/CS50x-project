@@ -1,4 +1,5 @@
 import os
+import redis # type: ignore
 from dotenv import load_dotenv
 
 
@@ -14,10 +15,16 @@ class Config:
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 	# Session configuration
-	SESSION_TYPE = 'filesystem'
-	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
+	SESSION_TYPE = 'redis'
 	SESSION_PERMANENT = False
 	SESSION_USER_SIGNER = True
+	SESSION_KEY_PREFIX = 'session:'
+	SESSION_REDIS = redis.StrictRedis(
+		host=os.getenv('REDIS_HOST'),
+		port=os.getenv('REDIS_PORT'),
+		password=os.getenv('REDIS_PASSWORD'),
+		ssl=True
+	)
 
 	# Google OAuth configuration
 	GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
@@ -30,11 +37,11 @@ class Config:
 
 class TestConfig(Config):
 	TESTING = True
+	SESSION_TYPE = 'filesystem'
+	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
+	SESSION_REDIS = None
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 
 if __name__ == '__main__':
-	print('--- Configurations ---')
-	print(Config.SQLALCHEMY_DATABASE_URI)
-	print(Config.SECRET_KEY)
-	print(Config.SESSION_FILE_DIR)
+	pass
