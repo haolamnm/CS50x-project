@@ -1,5 +1,6 @@
 import os
 import redis # type: ignore
+from datetime import timedelta
 from dotenv import load_dotenv
 
 
@@ -25,6 +26,7 @@ class Config:
 		password=os.getenv('REDIS_PASSWORD'),
 		ssl=True
 	)
+	PERMANENT_SESSION_LIFETIME = timedelta(weeks=1)
 
 	# Google OAuth configuration
 	GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
