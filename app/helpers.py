@@ -49,14 +49,14 @@ def validate_password(password: str, confirmation: str) -> str | None:
 	return None
 
 
-def login_required(f):
+def login_required(f) -> callable:
     """
     Decorate routes to require login.
 
     https://flask.palletsprojects.com/en/latest/patterns/viewdecorators/
     """
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args, **kwargs) -> callable:
         if session.get("user_id") is None:
             flash('Please login to access this page', 'warning')
             return redirect("/login")
@@ -65,9 +65,9 @@ def login_required(f):
     return decorated_function
 
 
-def profile_completed_required(f):
+def profile_completed_required(f) -> callable:
 	@wraps(f)
-	def decorated_function(*args, **kwargs):
+	def decorated_function(*args, **kwargs) -> callable:
 		user = User.query.get(session['user_id'])
 		if user and (user.username is None or user.email is None or user.password is None):
 			flash('Please complete your profile before proceeding', 'warning')

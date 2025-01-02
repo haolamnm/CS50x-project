@@ -1,18 +1,21 @@
-import unittest
-import pytest # type: ignore
+from unittest import TestCase, main
+from pytest import mark # type: ignore
 from app import create_app, db
 from app.models import User
 from config import TestConfig
 from werkzeug.security import generate_password_hash
 from app.helpers import validate_username, validate_email, validate_password
-from tests.cases import TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL, INVALID_USERNAME_TEST_CASES, INVALID_EMAIL_TEST_CASES, INVALID_PASSWORD_TEST_CASES
+from tests.cases import (TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL,
+						 INVALID_USERNAME_TEST_CASES,
+						 INVALID_EMAIL_TEST_CASES,
+						 INVALID_PASSWORD_TEST_CASES)
 
 
-pytestmark = pytest.mark.filterwarnings('ignore::DeprecationWarning')
+pytestmark = mark.filterwarnings('ignore::DeprecationWarning')
 
 
-class TestHelpers(unittest.TestCase):
-	def setUp(self):
+class TestHelpers(TestCase):
+	def setUp(self) -> None:
 		self.app = create_app(TestConfig)
 		self.app_context = self.app.app_context()
 		self.app_context.push()
@@ -32,29 +35,29 @@ class TestHelpers(unittest.TestCase):
 		db.session.commit()
 
 
-	def tearDown(self):
+	def tearDown(self) -> None:
 		db.session.remove()
 		db.drop_all()
 		self.app_context.pop()
 
 
-	def test_validate_username(self):
+	def test_validate_username(self) -> None:
 		for username, error in INVALID_USERNAME_TEST_CASES:
 			self.assertEqual(validate_username(username), error)
 		self.assertEqual(validate_username(r'valid'), None)
 
 
-	def test_validate_email(self):
+	def test_validate_email(self) -> None:
 		for email, error in INVALID_EMAIL_TEST_CASES:
 			self.assertEqual(validate_email(email), error)
 		self.assertEqual(validate_email(r'valid@gmail.com'), None)
 
 
-	def test_validate_password(self):
+	def test_validate_password(self) -> None:
 		for password, confirmation, error in INVALID_PASSWORD_TEST_CASES:
 			self.assertEqual(validate_password(password, confirmation), error)
 		self.assertEqual(validate_password(TEST_PASSWORD, TEST_PASSWORD), None)
 
 
 if __name__ == '__main__':
-	unittest.main()
+	main()

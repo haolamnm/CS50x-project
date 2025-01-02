@@ -24,7 +24,7 @@ google = oauth.register(
 
 
 @main.after_request
-def after_request(response):
+def after_request(response: object) -> object:
 	""""Ensure responses aren't cached"""
 	response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 	response.headers['Expires'] = 0
@@ -32,13 +32,13 @@ def after_request(response):
 	return response
 
 
-@main.route('/')
-def index():
+@main.route('/', methods=['GET'])
+def index() -> str:
 	return render_template('index.html')
 
 
 @main.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> str:
 	if request.method == 'POST':
 		username = request.form['username'].strip().lower()
 		username_error = validate_username(username)
@@ -79,7 +79,7 @@ def register():
 
 
 @main.route('/login', methods=['GET', 'POST'])
-def login():
+def login() -> str:
 	if request.method == 'POST':
 		session.clear()
 		login_type = request.form['login_type']
@@ -123,34 +123,34 @@ def login():
 		return render_template('login.html')
 
 
-@main.route('/logout')
+@main.route('/logout', methods=['GET'])
 @login_required
 @profile_completed_required
-def logout():
+def logout() -> str:
 	session.clear()
 	flash('Logged out successfully', 'success')
 	return redirect(url_for('main.index'))
 
 
-@main.route('/profile')
+@main.route('/profile', methods=['GET'])
 @login_required
 @profile_completed_required
-def profile():
+def profile() -> str:
 	user = User.query.get(session['user_id'])
 	return render_template('profile.html', user=user)
 
 
-@main.route('/timer')
+@main.route('/timer', methods=['GET'])
 @login_required
 @profile_completed_required
-def timer():
+def timer() -> str:
 	return render_template('timer.html')
 
 
 @main.route('/update', methods=['POST'])
 @login_required
 @profile_completed_required
-def update():
+def update() -> str:
 	update_type = request.form['update_type']
 	if update_type not in ['username_update', 'email_update', 'password_update']:
 		flash('Invalid update type', 'warning')
@@ -205,8 +205,8 @@ def update():
 	return redirect(url_for('main.profile'))
 
 
-@main.route('/login/google')
-def login_google():
+@main.route('/login/google', methods=['GET'])
+def login_google() -> str:
 	try:
 		redirect_uri = url_for('main.authorize_google', _external=True)
 		return google.authorize_redirect(redirect_uri)
@@ -216,8 +216,8 @@ def login_google():
 		return redirect(url_for('main.login'))
 
 
-@main.route('/authorize/google')
-def authorize_google():
+@main.route('/authorize/google', methods=['GET'])
+def authorize_google() -> str:
 	try:
 		token = google.authorize_access_token()
 		userinfo_endpoint = google.server_metadata['userinfo_endpoint']
@@ -270,7 +270,7 @@ def authorize_google():
 
 @main.route('/profile/complete', methods=['GET', 'POST'])
 @login_required
-def profile_complete():
+def profile_complete() -> str:
 	user = User.query.get(session['user_id'])
 
 	if user.username is not None and user.email is not None and user.password is not None:
@@ -312,7 +312,7 @@ def profile_complete():
 		session['email'] = user.email
 		session['oauth_provider'] = user.oauth_provider
 
-		flash('Profile updated successfully', 'success')
+		flash('Profile completed successfully', 'success')
 		return redirect(url_for('main.profile'))
 
 	else:
