@@ -4,8 +4,10 @@ __pycache__/
 *.py[cod]
 
 # Flask-Session
-flask_session/
-flask_cache/
+flask_session/*
+!flask_session/.gitkeep
+flask_cache/*
+!flask_cache/.gitkeep
 
 # Flask-SQLAlchemy
 migrations/
