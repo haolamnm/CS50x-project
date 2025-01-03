@@ -37,6 +37,13 @@ class Config:
 	GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 
 
+class DevelopmentConfig(Config):
+	DEBUG = True
+	SESSION_TYPE = 'filesystem'
+	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
+	SESSION_REDIS = None
+
+
 class TestConfig(Config):
 	TESTING = True
 	SESSION_TYPE = 'filesystem'
