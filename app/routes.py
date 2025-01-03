@@ -396,16 +396,13 @@ def profile_complete() -> str:
 def send_reset_email(user: User) -> None:
 	token = user.get_token()
 	msg = Message(
-		'Simple Timer - Password Reset',
+		subject='[Pomodoro 50] Reset Password Request',
 		sender=app.config['MAIL_USERNAME'],
 		recipients=[user.email]
 	)
-	msg.body = f'''To reset your password, visit the following link:
-
-	{url_for('main.reset_password_token', token=token, _external=True)}
-
-	If you did not make this request, ignore this email.
-	'''
+	reset_url = url_for('main.reset_password_token', token=token, _external=True)
+	msg.body = render_template('emails/reset_password_email.txt', username=user.username, reset_url=reset_url)
+	msg.html = render_template('emails/reset_password_email.html', username=user.username, reset_url=reset_url)
 	mail.send(msg)
 
 
