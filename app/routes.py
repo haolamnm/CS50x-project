@@ -217,7 +217,7 @@ def update() -> str:
 	except Exception as e:
 		db.session.rollback()
 		flash('An error occurred', 'danger')
-		print(e)
+		app.logger.error(e)
 
 	return redirect(url_for('main.profile'))
 
@@ -229,7 +229,7 @@ def login_google() -> str:
 		return google.authorize_redirect(redirect_uri)
 	except Exception as e:
 		flash('An error occurred during login with Google', 'danger')
-		print(e)
+		app.logger.error(e)
 		return redirect(url_for('main.login'))
 
 
@@ -281,7 +281,7 @@ def authorize_google() -> str:
 
 	except Exception as e:
 		flash('Error occurred during authorization with Google', 'danger')
-		print(e)
+		app.logger.error(e)
 		return redirect(url_for('main.login'))
 
 
@@ -292,7 +292,7 @@ def login_github() -> str:
 		return github.authorize_redirect(redirect_uri)
 	except Exception as e:
 		flash('Error occurred during login with GitHub', 'danger')
-		print(e)
+		app.logger.error(e)
 		return redirect(url_for('main.login'))
 
 
@@ -338,7 +338,7 @@ def authorize_github() -> str:
 
 	except Exception as e:
 		flash('Error occurred during authorization with GitHub', 'danger')
-		print(e)
+		app.logger.error(e)
 		return redirect(url_for('main.login'))
 
 
