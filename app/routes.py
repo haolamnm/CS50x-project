@@ -3,6 +3,7 @@ from app.helpers import validate_username, validate_email, validate_password, lo
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
 from app import db
+from flask_mail import Mail, Message # type: ignore
 from authlib.integrations.flask_client import OAuth # type: ignore
 import uuid
 
@@ -35,6 +36,8 @@ github = oauth.register(
 		'scope': 'user:email'
 	}
 )
+
+mail = Mail(app)
 
 
 @main.after_request
@@ -388,3 +391,64 @@ def profile_complete() -> str:
 
 	else:
 		return render_template('profile_complete.html', user=user)
+
+
+def send_reset_email(user: User) -> None:
+	token = user.get_token()
+	msg = Message(
+		'Simple Timer - Password Reset',
+		sender=app.config['MAIL_USERNAME'],
+		recipients=[user.email]
+	)
+	msg.body = f'''To reset your password, visit the following link:
+
+	{url_for('main.reset_password_token', token=token, _external=True)}
+
+	If you did not make this request, ignore this email.
+	'''
+	mail.send(msg)
+
+
+@main.route('/reset_password', methods=['GET', 'POST'])
+def reset_password() -> str:
+	if request.method == 'POST':
+		email = request.form['email'].strip()
+
+		user = User.query.filter_by(email=email).first()
+		if not user:
+			flash('User not found', 'warning')
+			return redirect(url_for('main.reset_password'))
+		else:
+			send_reset_email(user)
+			flash('Reset email sent', 'success')
+			return redirect(url_for('main.login'))
+
+	else:
+		return render_template('reset_password.html')
+
+
+@main.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password_token(token: str) -> None:
+	user = User.verify_token(token)
+	if user is None:
+		flash('Invalid or expired token', 'warning')
+		return redirect(url_for('main.reset_password'))
+
+	if request.method == 'POST':
+		new_password = request.form['new_password']
+		confirmation = request.form['confirmation']
+
+		password_error = validate_password(new_password, confirmation)
+		if password_error:
+			flash(password_error, 'warning')
+			return redirect(url_for('main.reset_password_token', token=token))
+
+		user.password = generate_password_hash(new_password, salt_length=16)
+		db.session.commit()
+
+		flash('Password changed successfully', 'success')
+		return redirect(url_for('main.login'))
+
+	else:
+		return render_template('change_password.html', token=token)
+

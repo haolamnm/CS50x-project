@@ -36,6 +36,13 @@ class Config:
 	GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
 	GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
 
+	# Mail configuration
+	MAIL_SERVER = os.getenv('MAIL_SERVER')
+	MAIL_PORT = int(os.getenv('MAIL_PORT'))
+	MAIL_USE_TLS = True
+	MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+	MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+
 
 class DevelopmentConfig(Config):
 	DEBUG = True
