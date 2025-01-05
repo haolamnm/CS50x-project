@@ -1,5 +1,5 @@
 import os
-import redis # type: ignore
+import redis
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -8,6 +8,11 @@ load_dotenv()
 
 
 class Config:
+	"""
+	The base configuration class for the Flask app.
+	All other configuration classes will inherit from this class.
+	"""
+
 	# Secret key configuration
 	SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -45,17 +50,33 @@ class Config:
 
 
 class DevelopmentConfig(Config):
+	"""
+	The configuration class for the development stage of the Flask app.
+	"""
+
+	# Enable debug mode
 	DEBUG = True
+
+	# Session configuration
 	SESSION_TYPE = 'filesystem'
 	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
 	SESSION_REDIS = None
 
 
 class TestConfig(Config):
+	"""
+	The configuration class for the running unit tests on the Flask app.
+	"""
+
+	# Enable testing mode
 	TESTING = True
+
+	# Session configuration
 	SESSION_TYPE = 'filesystem'
 	SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session')
 	SESSION_REDIS = None
+
+	# Database configuration
 	SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 
