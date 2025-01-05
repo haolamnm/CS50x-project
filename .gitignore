@@ -24,3 +24,8 @@ venv/
 
 # Pytest
 .pytest_cache/
+
+# Logs
+app/logs/*
+!app/logs/.gitkeep
+
