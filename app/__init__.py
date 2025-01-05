@@ -1,26 +1,32 @@
 import logging
-from flask import Flask, flash, render_template
+from flask import Flask
 from config import Config
-from flask_migrate import Migrate
-from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
+from app.extensions import *
 
 
-db = SQLAlchemy()
-migrate = Migrate()
+def create_app(config_class: type[Config] = Config) -> Flask:
+	"""
+	Create and configure the Flask app.
 
-
-def create_app(config_class: Config=Config) -> Flask:
+	:param config_class: The configuration class to use.
+	:return: The Flask app instance.
+	"""
 	app = Flask(__name__)
 	app.config.from_object(config_class)
 
+	# INFO: Initialize extensions
 	db.init_app(app)
+	mail.init_app(app)
+	oauth.init_app(app)
 	migrate.init_app(app, db)
-	Session(app)
+	session.init_app(app)
+	app.logger.info('[INFO] Extensions initialized')
 
+	# INFO: Create the database
 	with app.app_context():
-		from app import routes, models
+		from app import routes, models, helpers
 		db.create_all()
+		app.logger.info('[INFO] Database created')
 
 	# INFO: Set up console logging
 	if not app.debug and not app.testing:
@@ -29,14 +35,14 @@ def create_app(config_class: Config=Config) -> Flask:
 		app.logger.addHandler(stream_handler)
 
 	app.logger.setLevel(logging.INFO)
-	app.logger.info('Flask App startup')
+	app.logger.info('[INFO] Flask app successfully started')
 
+	# INFO: Register the main blueprint
 	from app.routes import main as main_blueprint
 	app.register_blueprint(main_blueprint)
 
-	@app.errorhandler(404)
-	def page_not_found(e):
-		flash('Page not found', 'danger')
-		return render_template('404.html'), 404
-
 	return app
+
+
+if __name__ == '__main__':
+	pass
