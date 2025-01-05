@@ -97,3 +97,7 @@ PROFILE_COMPLETED_REQUIRED_TEST_CASES = { # (username, email, password)
 	(TEST_NEW_USERNAME, TEST_NEW_EMAIL, None),
 	(None, TEST_NEW_EMAIL, TEST_PASSWORD),
 } # Number: 3
+
+
+if __name__ == '__main__':
+	pass

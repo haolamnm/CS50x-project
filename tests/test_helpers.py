@@ -1,14 +1,12 @@
-from unittest import TestCase, main
-from pytest import mark # type: ignore
-from app import create_app, db
+from app import create_app
+from app.extensions import db
 from app.models import User
-from config import TestConfig
-from werkzeug.security import generate_password_hash
 from app.helpers import validate_username, validate_email, validate_password
-from tests.cases import (TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL,
-						 INVALID_USERNAME_TEST_CASES,
-						 INVALID_EMAIL_TEST_CASES,
-						 INVALID_PASSWORD_TEST_CASES)
+from unittest import TestCase, main
+from pytest import mark
+from app.config import TestConfig
+from werkzeug.security import generate_password_hash
+from tests.cases import *
 
 
 pytestmark = mark.filterwarnings('ignore::DeprecationWarning')

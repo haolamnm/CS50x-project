@@ -1,8 +1,9 @@
-from unittest import TestCase, main
-from pytest import mark # type: ignore
-from app import create_app, db
+from app import create_app
+from app.extensions import db
 from app.models import User
-from config import TestConfig
+from unittest import TestCase, main
+from pytest import mark
+from app.config import TestConfig
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.test import TestResponse
 from tests.cases import *
