@@ -1,6 +1,6 @@
 import logging
 from flask import Flask
-from config import Config
+from app.config import Config
 from app.extensions import *
 
 
@@ -17,9 +17,11 @@ def create_app(config_class: type[Config] = Config) -> Flask:
 	# INFO: Initialize extensions
 	db.init_app(app)
 	mail.init_app(app)
-	oauth.init_app(app)
-	migrate.init_app(app, db)
 	session.init_app(app)
+	migrate.init_app(app, db)
+	oauth.init_app(app)
+	google_init(oauth, app)
+	github_init(oauth, app)
 	app.logger.info('[INFO] Extensions initialized')
 
 	# INFO: Create the database

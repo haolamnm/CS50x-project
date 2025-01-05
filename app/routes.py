@@ -1,61 +1,57 @@
-from flask import current_app as app, render_template, flash, redirect, url_for, request, session, Blueprint
-from app.helpers import validate_username, validate_email, validate_password, login_required, profile_completed_required
+from flask import current_app as app
+from flask import render_template, flash, redirect, url_for, request, session, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
-from app import db
-from flask_mail import Mail, Message # type: ignore
-from authlib.integrations.flask_client import OAuth # type: ignore
-import uuid
+from app.helpers import *
+from app.extensions import db, mail, oauth
 
 
 main = Blueprint('main', __name__)
 
 
-oauth = OAuth(app)
-
-google = oauth.register(
-    name='google',
-    client_id=app.config['GOOGLE_CLIENT_ID'],
-    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={
-        'scope': 'openid email profile'
-    }
-)
-
-github = oauth.register(
-	name='github',
-	client_id=app.config['GITHUB_CLIENT_ID'],
-	client_secret=app.config['GITHUB_CLIENT_SECRET'],
-	access_token_url='https://github.com/login/oauth/access_token',
-	access_token_params=None,
-	authorize_url='https://github.com/login/oauth/authorize',
-	authorize_params=None,
-	api_base_url='https://api.github.com/',
-	client_kwargs={
-		'scope': 'user:email'
-	}
-)
-
-mail = Mail(app)
-
-
 @main.after_request
 def after_request(response: object) -> object:
-	""""Ensure responses aren't cached"""
+	""""
+	Ensure responses aren't cached
+
+	:param response: The response object.
+	:return: The response object.
+	"""
 	response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 	response.headers['Expires'] = 0
 	response.headers['Pragma'] = 'no-cache'
 	return response
 
 
+@app.errorhandler(404)
+def page_not_found(error: Exception) -> tuple[str, int]:
+	"""
+	Handle 404 errors
+
+	:param error: The error object.
+	:return: 404 error page.
+	"""
+	flash('Page not found', 'danger')
+	return render_template('404.html'), 404
+
+
 @main.route('/', methods=['GET'])
 def index() -> str:
+	"""
+	The main homepage route
+
+	:return: The homepage template.
+	"""
 	return render_template('index.html')
 
 
 @main.route('/register', methods=['GET', 'POST'])
 def register() -> str:
+	"""
+	The registration route
+
+	:return: The registration template.
+	"""
 	if request.method == 'POST':
 		username = request.form['username'].strip().lower()
 		username_error = validate_username(username)
@@ -84,27 +80,30 @@ def register() -> str:
 		db.session.add(user)
 		db.session.commit()
 
-		session['user_id'] = user.id
-		session['username'] = user.username
-		session['email'] = user.email
-		session['oauth_provider'] = user.oauth_provider
+		session_add(user)
 
 		flash('User registered successfully', 'success')
 		return redirect(url_for('main.index'))
-	else:
-		return render_template('register.html')
+
+	return render_template('register.html')
 
 
 @main.route('/login', methods=['GET', 'POST'])
 def login() -> str:
+	"""
+	Handle the login route
+
+	:return: The login template.
+	"""
 	if request.method == 'POST':
 		session.clear()
+
 		login_type = request.form['login_type']
 		if login_type not in ['username_login', 'email_login']:
 			flash('Invalid login type', 'warning')
 			return redirect(url_for('main.login'))
 
-		user = None
+		user: User = None
 
 		if login_type == 'username_login':
 			username = request.form['username'].strip().lower()
@@ -129,21 +128,23 @@ def login() -> str:
 			flash('Invalid credentials', 'warning')
 			return redirect(url_for('main.login'))
 
-		session['user_id'] = user.id
-		session['username'] = user.username
-		session['email'] = user.email
-		session['oauth_provider'] = user.oauth_provider
+		session_add(user)
 
 		flash('Logged in successfully', 'success')
 		return redirect(url_for('main.index'))
-	else:
-		return render_template('login.html')
+
+	return render_template('login.html')
 
 
 @main.route('/logout', methods=['GET'])
 @login_required
 @profile_completed_required
 def logout() -> str:
+	"""
+	Logout the user
+
+	:return: Redirect to the homepage.
+	"""
 	session.clear()
 	flash('Logged out successfully', 'success')
 	return redirect(url_for('main.index'))
@@ -153,6 +154,11 @@ def logout() -> str:
 @login_required
 @profile_completed_required
 def profile() -> str:
+	"""
+	The user profile route
+
+	:return: The profile template.
+	"""
 	user = User.query.get(session['user_id'])
 	return render_template('profile.html', user=user)
 
@@ -161,6 +167,11 @@ def profile() -> str:
 @login_required
 @profile_completed_required
 def timer() -> str:
+	"""
+	The timer route
+
+	:return: The timer template.
+	"""
 	return render_template('timer.html')
 
 
@@ -168,6 +179,11 @@ def timer() -> str:
 @login_required
 @profile_completed_required
 def update() -> str:
+	"""
+	Update user information
+
+	:return: Redirect to the profile page.
+	"""
 	update_type = request.form['update_type']
 	if update_type not in ['username_update', 'email_update', 'password_update']:
 		flash('Invalid update type', 'warning')
@@ -211,9 +227,9 @@ def update() -> str:
 
 	try:
 		db.session.commit()
-		session['username'] = user.username
-		session['email'] = user.email
+		session_add(user)
 		flash('Profile updated successfully', 'success')
+
 	except Exception as e:
 		db.session.rollback()
 		flash('An error occurred', 'danger')
@@ -224,9 +240,15 @@ def update() -> str:
 
 @main.route('/login/google', methods=['GET'])
 def login_google() -> str:
+	"""
+	For Google login
+
+	:return: Redirect to the Google login page.
+	"""
 	try:
 		redirect_uri = url_for('main.authorize_google', _external=True)
-		return google.authorize_redirect(redirect_uri)
+		return oauth.google.authorize_redirect(redirect_uri)
+
 	except Exception as e:
 		flash('An error occurred during login with Google', 'danger')
 		app.logger.error(e)
@@ -235,10 +257,15 @@ def login_google() -> str:
 
 @main.route('/login/google/authorize', methods=['GET'])
 def authorize_google() -> str:
+	"""
+	Get the user information from Google
+
+	:return: Redirect to the homepage.
+	"""
 	try:
-		token = google.authorize_access_token()
-		userinfo_endpoint = google.server_metadata['userinfo_endpoint']
-		response = google.get(userinfo_endpoint)
+		oauth.google.authorize_access_token()
+		userinfo_endpoint = oauth.google.server_metadata['userinfo_endpoint']
+		response = oauth.google.get(userinfo_endpoint)
 		userinfo = response.json()
 
 		email = userinfo['email']
@@ -252,9 +279,9 @@ def authorize_google() -> str:
 			username = userinfo['email'].split('@')[0]
 			username_error = validate_username(username)
 			if username_error:
-				username = 'user_' + str(uuid.uuid4().hex[:8])
+				username = None
 			user = User(
-				username=None,
+				username=username,
 				email=email,
 				password=None,
 				oauth_provider=oauth_provider,
@@ -262,6 +289,7 @@ def authorize_google() -> str:
 			)
 			db.session.add(user)
 			updated = True
+
 		elif user.oauth_provider != oauth_provider or user.oauth_id != oauth_id:
 			user.oauth_provider = oauth_provider
 			user.oauth_id = oauth_id
@@ -270,11 +298,7 @@ def authorize_google() -> str:
 		if updated:
 			db.session.commit()
 
-		session['user_id'] = user.id
-		session['username'] = user.username
-		session['email'] = user.email
-		session['oauth_provider'] = oauth_provider
-		session['oauth_id'] = oauth_id
+		session_add(user, oauth_provider, oauth_id)
 
 		flash('Logged in successfully', 'success')
 		return redirect(url_for('main.index'))
@@ -287,9 +311,15 @@ def authorize_google() -> str:
 
 @main.route('/login/github', methods=['GET'])
 def login_github() -> str:
+	"""
+	For GitHub login
+
+	:return: Redirect to the GitHub login page.
+	"""
 	try:
 		redirect_uri = url_for('main.authorize_github', _external=True)
-		return github.authorize_redirect(redirect_uri)
+		return oauth.github.authorize_redirect(redirect_uri)
+
 	except Exception as e:
 		flash('Error occurred during login with GitHub', 'danger')
 		app.logger.error(e)
@@ -298,13 +328,22 @@ def login_github() -> str:
 
 @main.route('/login/github/authorize', methods=['GET'])
 def authorize_github() -> str:
+	"""
+	Get the user information from GitHub
+
+	:return: Redirect to the homepage.
+	"""
 	try:
-		token = github.authorize_access_token()
-		response = github.get('user').json()
+		oauth.github.authorize_access_token()
+		response = oauth.github.get('user').json()
 		email = response['email']
 		username = response['login']
 		oauth_id = response['id']
 		oauth_provider = 'github'
+
+		username_error = validate_username(username)
+		if username_error:
+			username = None
 
 		user = User.query.filter_by(email=email).first()
 		updated = False
@@ -319,6 +358,7 @@ def authorize_github() -> str:
 			)
 			db.session.add(user)
 			updated = True
+
 		elif user.oauth_provider != oauth_provider or user.oauth_id != oauth_id:
 			user.oauth_provider = oauth_provider
 			user.oauth_id = oauth_id
@@ -327,11 +367,7 @@ def authorize_github() -> str:
 		if updated:
 			db.session.commit()
 
-		session['user_id'] = user.id
-		session['username'] = user.username
-		session['email'] = user.email
-		session['oauth_provider'] = oauth_provider
-		session['oauth_id'] = oauth_id
+		session_add(user, oauth_provider, oauth_id)
 
 		flash('Logged in successfully', 'success')
 		return redirect(url_for('main.index'))
@@ -345,14 +381,19 @@ def authorize_github() -> str:
 @main.route('/profile/complete', methods=['GET', 'POST'])
 @login_required
 def profile_complete() -> str:
+	"""
+	Handle the profile completion route
+
+	:return: The profile completion template.
+	"""
 	user = User.query.get(session['user_id'])
 
 	if user.username is not None and user.email is not None and user.password is not None:
 		flash('Profile is already complete', 'info')
 		return redirect(url_for('main.profile'))
 
-	elif request.method == 'POST':
-		if user.username is None or user.username == '':
+	if request.method == 'POST':
+		if user.username is None:
 			username = request.form['username'].strip().lower()
 			username_error = validate_username(username)
 			if username_error:
@@ -361,7 +402,7 @@ def profile_complete() -> str:
 
 			user.username = username
 
-		if user.email is None or user.email == '':
+		if user.email is None:
 			email = request.form['email'].strip()
 			email_error = validate_email(email)
 			if email_error:
@@ -370,7 +411,7 @@ def profile_complete() -> str:
 
 			user.email = email
 
-		if user.password is None or user.password == '':
+		if user.password is None:
 			password = request.form['password']
 			confirmation = request.form['confirmation']
 			password_error = validate_password(password, confirmation)
@@ -382,50 +423,50 @@ def profile_complete() -> str:
 
 		db.session.commit()
 
-		session['username'] = user.username
-		session['email'] = user.email
-		session['oauth_provider'] = user.oauth_provider
+		session_add(user, user.oauth_provider)
 
 		flash('Profile completed successfully', 'success')
 		return redirect(url_for('main.profile'))
 
-	else:
-		return render_template('profile_complete.html', user=user)
+	return render_template('profile_complete.html', user=user)
 
 
-def send_reset_email(user: User) -> None:
-	token = user.get_token()
-	msg = Message(
-		subject='[Pomodoro 50] Reset Password Request',
-		sender=app.config['MAIL_USERNAME'],
-		recipients=[user.email]
-	)
-	reset_url = url_for('main.reset_password_token', token=token, _external=True)
-	msg.body = render_template('emails/reset_password_email.txt', username=user.username, reset_url=reset_url)
-	msg.html = render_template('emails/reset_password_email.html', username=user.username, reset_url=reset_url)
-	mail.send(msg)
+
+	# mail.send(msg)
 
 
 @main.route('/reset_password', methods=['GET', 'POST'])
 def reset_password() -> str:
+	"""
+	Handle the password reset route
+
+	:return: The password reset request template.
+	"""
 	if request.method == 'POST':
 		email = request.form['email'].strip()
-
 		user = User.query.filter_by(email=email).first()
+
 		if not user:
 			flash('User not found', 'warning')
 			return redirect(url_for('main.reset_password'))
 		else:
-			send_reset_email(user)
+			msg = create_reset_password_email(user)
+			app.logger.info(f'[INFO] Mail object: {mail}')
+			mail.send(msg)
 			flash('Reset email sent', 'success')
 			return redirect(url_for('main.login'))
 
-	else:
-		return render_template('reset_password.html')
+	return render_template('reset_password.html')
 
 
 @main.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password_token(token: str) -> None:
+	"""
+	Handle the password reset route when token is provided
+
+	:param token: The token.
+	:return: The new password reset template.
+	"""
 	user = User.verify_token(token)
 	if user is None:
 		flash('Invalid or expired token', 'warning')
@@ -446,6 +487,8 @@ def reset_password_token(token: str) -> None:
 		flash('Password changed successfully', 'success')
 		return redirect(url_for('main.login'))
 
-	else:
-		return render_template('change_password.html', token=token)
+	return render_template('change_password.html', token=token)
 
+
+if __name__ == '__main__':
+	pass
