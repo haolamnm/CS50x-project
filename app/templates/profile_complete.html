@@ -9,8 +9,8 @@ Profile Completion
 	<h3>Complete your Info</h3>
 	<form action="/profile/complete" method="post">
 
-		<!-- For Username -->
 		{% if user.username is none or user.username == "" %}
+		<!-- For Username -->
 		<div class="mb-3 mt-3 input-group">
 			<span class="input-group-text"><ion-icon name="person-circle-outline"></ion-icon></span>
 			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="username" placeholder="Username"
@@ -18,8 +18,8 @@ Profile Completion
 		</div>
 		{% endif %}
 
-		<!-- For Email -->
 		{% if user.email is none or user.email == "" %}
+		<!-- For Email -->
 		<div class="mb-3 input-group">
 			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
 			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email"
@@ -27,8 +27,8 @@ Profile Completion
 		</div>
 		{% endif %}
 
-		<!-- For Password -->
 		{% if user.password is none or user.password == "" %}
+		<!-- For Password -->
 		<div class="mb-3 input-group">
 			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
@@ -38,10 +38,8 @@ Profile Completion
 				<ion-icon name="eye-off"></ion-icon>
 			</button>
 		</div>
-		{% endif %}
 
 		<!-- For Password Confirmation -->
-		{% if user.password is none or user.password == "" %}
 		<div class="mb-3 input-group">
 			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
 			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="confirmation"
