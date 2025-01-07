@@ -1,6 +1,6 @@
 # Pomodoro 50
 
-Fisrt of all, This is my project for CS50x 2024.
+First of all, this is my project for CS50x 2024.
 
 Welcome to Pomodoro 50! A Flask web application that helps you manage your study session. The difference between Pomodoro 50 and other Pomodoro timers is that Pomodoro 50 is a 50-minute timer, not a 25-minute timer. Yes, you read that right! I found that 25 minutes is too short for me to focus on my work, so I decided to make a 50-minute timer instead.
 
