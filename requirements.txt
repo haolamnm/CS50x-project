@@ -1,4 +1,4 @@
-alembic==1.14.0
+
 annotated-types==0.7.0
 attrs==24.3.0
 Authlib==1.4.0
