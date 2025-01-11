@@ -1,3 +1,28 @@
+a:not(.nav-link):not(.navbar-brand) {
+	text-decoration: none;
+	position: relative;
+}
+
+a:not(.nav-link):not(.navbar-brand)::after {
+	content: '';
+	position: absolute;
+	width: 0;
+	height: 2px;
+	background: #8bb9fe;
+	left: 0;
+	bottom: -2px;
+	transition: width 0.25s ease-in-out;
+}
+
+a.footer-icon::after {
+	background: #edf1f7 !important;
+}
+
+a:not(.nav-link):not(.navbar-brand):hover::after {
+	width: 100%;
+}
+
+
 #timer {
 	font-family: 'Noto Sans Mono', serif;
 }
@@ -8,6 +33,14 @@
 
 .password-eye {
 	min-width: auto;
+}
+
+.text-justify {
+	text-align: justify;
+}
+
+.indent-1 {
+	text-indent: 1em;
 }
 
 #cal-heatmap {
