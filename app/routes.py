@@ -490,5 +490,25 @@ def reset_password_token(token: str) -> None:
 	return render_template('change_password.html', token=token)
 
 
+@main.route('/about', methods=['GET'])
+def about() -> str:
+	return render_template('about.html')
+
+
+@main.route('/insights', methods=['GET'])
+def insights() -> str:
+	return render_template('insights.html')
+
+
+@main.route('/history', methods=['GET'])
+def history() -> str:
+	return render_template('history.html')
+
+
+@main.route('/settings', methods=['GET'])
+def settings() -> str:
+	return render_template('settings.html')
+
+
 if __name__ == '__main__':
 	pass
