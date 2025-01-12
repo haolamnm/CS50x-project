@@ -132,7 +132,7 @@ def complete_password() -> str:
 			flash('Profile completed successfully', 'success')
 			return redirect(url_for('profile.index'))
 
-	return render_template('profile/complete_password.html', user=user)
+	return render_template('profile/complete_password.html')
 
 
 @profile.route('/reset/password', methods=['GET', 'POST'])
@@ -192,14 +192,36 @@ def reset_password_token(token: str) -> str:
 
 @profile.route('/delete', methods=['POST'])
 @login_required
-@profile_completed_required
 def delete() -> str:
 	"""
 	This function deletes the user's account.
 
 	:return: Redirect to the homepage.
 	"""
-	pass
+	password = request.form['password']
+	if not password:
+		flash('Password is required', 'warning')
+		return redirect(url_for('profile.index'))
+
+	user = User.query.get(session['user_id'])
+
+	if not check_password_hash(user.password, password):
+		flash('Invalid credentials', 'warning')
+		return redirect(url_for('profile.index'))
+
+	try:
+		db.session.delete(user)
+		db.session.commit()
+		session.clear()
+		flash('Account deleted successfully', 'success')
+
+	except Exception as e:
+		db.session.rollback()
+		flash('An error occurred', 'danger')
+		app.logger.error(e)
+		return redirect(url_for('profile.index'))
+
+	return redirect(url_for('signup.index'))
 
 
 if __name__ == '__main__':

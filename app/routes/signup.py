@@ -48,7 +48,7 @@ def signup_email() -> str:
 	session_add(user)
 
 	flash('User registered successfully', 'success')
-	return redirect(url_for('main.index'))
+	return redirect(url_for('home.index'))
 
 
 if __name__ == '__main__':
