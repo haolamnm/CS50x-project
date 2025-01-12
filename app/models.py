@@ -9,15 +9,34 @@ load_dotenv()
 
 
 class User(db.Model):
+	"""
+	User model.
+
+	Attributes:
+	- A user has a username, email, password, created date, OAuth provider and OAuth ID.
+
+	Relationships:
+	- A user has many tasks.
+	- A user has many pomodoro sessions.
+
+	Methods:
+	- get_token: Generate token for user authentication.
+	- verify_token: Verify token and return user based on user id. If token is invalid, return None.
+	"""
 	__tablename__ = 'users'
 
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
 	username = db.Column(db.String(100), nullable=True, unique=True)
 	email = db.Column(db.String(100), nullable=False, unique=True)
 	password = db.Column(db.String(255), nullable=True, unique=False)
-	created = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
+	create_time = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
 	oauth_provider = db.Column(db.String(50), nullable=True, unique=False, default='local')
 	oauth_id = db.Column(db.String(255), nullable=True, unique=False)
+
+	# Relationships
+	tasks = db.relationship('Task', backref='user', lazy=True)
+	pomodoro_sessions = db.relationship('PomodoroSession', backref='user', lazy=True)
+
 
 	def __init__(self, username: str, email: str, password: str, oauth_provider: str = 'local', oauth_id: str = None) -> None:
 		"""
@@ -70,6 +89,59 @@ class User(db.Model):
 		:return: The string representation.
 		"""
 		return f'<User #{self.id}: {self.username} - {self.email} - {self.oauth_provider}>'
+
+
+class Task(db.Model):
+	"""
+	Task model.
+
+	Attributes:
+	- A task has a title, description, created date.
+
+	Relationships:
+	- A task belongs to a user.
+	- A task has many pomodoro sessions
+
+	Methods:
+	- None
+	"""
+	__tablename__ = 'tasks'
+
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=False)
+	title = db.Column(db.String(100), nullable=False, unique=False)
+	description = db.Column(db.String(255), nullable=True, unique=False)
+	create_time = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
+
+	# Relationships
+	pomodoro_sessions = db.relationship('PomodoroSession', backref='task', lazy=True)
+
+
+class PomodoroSession(db.Model):
+	"""
+	Pomodoro session model.
+
+	Attributes:
+	- A pomodoro session has a task ID, user ID, start time, end time, duration, interupted, completed.
+
+	Relationships:
+	- A pomodoro session belongs to a task.
+	- A pomodoro session belongs to a user.
+	- A user can view all their Pomodoro sessions either directly or indirectly through a task.
+
+	Methods:
+	- None
+	"""
+	__tablename__ = 'pomodoro_sessions'
+
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+	task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), nullable=False, unique=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=False)
+	start_time = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
+	end_time = db.Column(db.DateTime, nullable=True, unique=False)
+	duration = db.Column(db.Integer, default=50, nullable=False, unique=False)
+	interupted = db.Column(db.Boolean, default=False, nullable=False, unique=False)
+	completed = db.Column(db.Boolean, default=False, nullable=False, unique=False)
 
 
 if __name__ == '__main__':
