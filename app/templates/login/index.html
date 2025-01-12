@@ -17,24 +17,24 @@ Log In | Pomodoro 50
 
 		<!-- Email -->
 		<div class="mb-3 input-group">
-			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+			<span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
 			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email" autofocus
 				autofocus type="email" required>
 		</div>
 
 		<!-- Password -->
 		<div class="mb-3 input-group">
-			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 			<input autocomplete="off" class="form-control mx-auto w-50 password-toggle" name="password" placeholder="Password"
 				type="password" required>
 			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 				onclick="togglePasswordVisibility(this)">
-				<ion-icon name="eye-off"></ion-icon>
+				<i class="fa-solid fa-eye-slash"></i>
 			</button>
 		</div>
 
 		<!-- Submit Button -->
-		<button class="btn btn-primary mx-auto w-100" type="submit">Log In</button>
+		<button class="btn btn-primary mx-auto w-100" type="submit">Log In <i class="fa-solid fa-right-to-bracket"></i></button>
 
 		<!-- Create an account and Forgot password -->
 		<div class="container mt-3">
@@ -54,23 +54,33 @@ Log In | Pomodoro 50
 		Or continue with
 	</p>
 
-	<!-- Login with Google+ API -->
-	<form action="{{ url_for('login.login_google') }}" method="get">
-		<div class="mb-3 input-group">
-			<button class="btn btn-outline-danger w-100" type="submit">
-				<ion-icon name="logo-google"></ion-icon> Log In with Google
-			</button>
-		</div>
-	</form>
+	<div class="container mt-3">
+		<div class="row">
 
-	<!-- Login with GitHub API -->
-	<form action="{{ url_for('login.login_github') }}" method="get">
-		<div class="mb-3 input-group">
-			<button class="btn btn-outline-light w-100" type="submit">
-				<ion-icon name="logo-github"></ion-icon> Log In with GitHub
-			</button>
+			<!-- Login with Google -->
+			<div class="col-6">
+				<form action="{{ url_for('login.login_google') }}" method="get">
+					<div class="mb-3 input-group">
+						<button class="btn btn-outline-danger w-100" type="submit">
+							<i class="fa-brands fa-google"></i> Google
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<!-- Login with GitHub API -->
+			<div class="col-6">
+				<form action="{{ url_for('login.login_github') }}" method="get">
+					<div class="mb-3 input-group">
+						<button class="btn btn-outline-light w-100" type="submit">
+							<i class="fa-brands fa-github"></i> GitHub
+						</button>
+					</div>
+				</form>
+			</div>
+
 		</div>
-	</form>
+	</div>
 
 </div>
 {% endblock %}

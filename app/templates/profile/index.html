@@ -5,22 +5,8 @@ Profile | Pomodoro 50
 {% endblock %}
 
 {% block main %}
-<!-- For Profile section -->
-<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
-	<div class="d-flex align-items-center">
-		<div class="p-2">
-			<img src="{{ url_for('static', filename='img/default.png') }}" class="img-fluid rounded-circle"
-				alt="Profile Image" style="width: 120px; height: 120px;">
-		</div>
-		<div class="p-2 pb-3">
-			<h3 class="text-light text-start">{{ session["username"] if session["username"] else "user" }}</h3>
-			<p class="text-secondary">{{ session["email"] }}</p>
-		</div>
-	</div>
-</div>
-
 <!-- For Progress Tracker section -->
-<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3 mt-3">
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
 	<h3 class="text-light">Progess Tracker</h3>
 	<div id="cal-heatmap" class="mx-auto"></div>
 </div>
@@ -32,40 +18,46 @@ Profile | Pomodoro 50
 
 		<!-- Change Email Tab -->
 		<li class="nav-item" role="presentation">
-			<button class="nav-link" id="email-tab-update" data-bs-toggle="tab" data-bs-target="#email-form-update"
-				type="button" role="tab">Email</button>
+			<button class="nav-link active" id="email-tab-update" data-bs-toggle="tab" data-bs-target="#email-form-update"
+				type="button" role="tab">Update Email</button>
 		</li>
 
 		<!-- Change Password Tab -->
 		<li class="nav-item" role="presentation">
 			<button class="nav-link" id="password-tab-update" data-bs-toggle="tab" data-bs-target="#password-form-update"
-				type="button" role="tab">Password</button>
+				type="button" role="tab">Update Password</button>
+		</li>
+
+		<!-- Delete Profile -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="delete-profile-tab" data-bs-toggle="tab" data-bs-target="#delete-profile-form"
+				type="button" role="tab">Delete Profile</button>
 		</li>
 	</ul>
 
 	<div class="tab-content mt-3">
 
 		<!-- Update Email Form -->
-		<div class="tab-pane fade" id="email-form-update" role="tabpanel">
+		<div class="tab-pane show active" id="email-form-update" role="tabpanel">
 			<form action="{{ url_for('profile.update_email') }}" method="post">
 
 				<!-- For New Email -->
 				<div class="mb-3 input-group">
-					<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
-					<input autocomplete="off" class="form-control" name="new_email" placeholder="New Email" type="email" required>
+					<span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+					<input autocomplete="off" class="form-control" name="new_email" placeholder="New Email" type="email" required autofocus>
 				</div>
 
 				<!-- For Password -->
 				<div class="mb-3 input-group">
-					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
 						placeholder="Password" type="password" required>
 					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 						onclick="togglePasswordVisibility(this)">
-						<ion-icon name="eye-off"></ion-icon>
+						<i class="fa-solid fa-eye-slash"></i>
 					</button>
 				</div>
-				<button class="btn btn-primary" type="submit">Update</button>
+				<button class="btn btn-primary" type="submit">Update <i class="fa-solid fa-check"></i></button>
 			</form>
 		</div>
 
@@ -75,37 +67,59 @@ Profile | Pomodoro 50
 
 				<!-- For New Password -->
 				<div class="mb-3 input-group">
-					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 					<input autocomplete="off" class="form-control password-toggle" name="new_password" placeholder="New Password"
 						type="password" required>
 					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 						onclick="togglePasswordVisibility(this)">
-						<ion-icon name="eye-off"></ion-icon>
+						<i class="fa-solid fa-eye-slash"></i>
 					</button>
 				</div>
 
 				<!-- For New Password Confirmation -->
 				<div class="mb-3 input-group">
-					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="new_confirmation"
 						placeholder="New Password (again)" type="password" required>
 					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 						onclick="togglePasswordVisibility(this)">
-						<ion-icon name="eye-off"></ion-icon>
+						<i class="fa-solid fa-eye-slash"></i>
 					</button>
 				</div>
 
 				<!-- For Password -->
 				<div class="mb-3 input-group">
-					<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+					<span class="input-group-text"><i class="fa-solid fa-user-lock"></i></span>
 					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
 						placeholder="Password" type="password" required>
 					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 						onclick="togglePasswordVisibility(this)">
-						<ion-icon name="eye-off"></ion-icon>
+						<i class="fa-solid fa-eye-slash"></i>
 					</button>
 				</div>
-				<button class="btn btn-primary" type="submit">Update</button>
+				<button class="btn btn-primary" type="submit">Update <i class="fa-solid fa-check"></i></button>
+			</form>
+		</div>
+
+		<!-- Delete Profile Form -->
+		<div class="tab-pane fade" id="delete-profile-form" role="tabpanel">
+			<form action="{{ url_for('profile.delete') }}" method="post">
+
+				<!-- For Password -->
+				<div class="mb-3 input-group">
+					<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+					<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
+						placeholder="Password" type="password" required>
+					<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+						onclick="togglePasswordVisibility(this)">
+						<i class="fa-solid fa-eye-slash"></i>
+					</button>
+				</div>
+
+				<!-- Ask for confirmation -->
+				<p class="text-danger">Are you sure you want to delete your profile?</p>
+
+				<button class="btn btn-danger" type="submit">Delete  <i class="fa-solid fa-user-slash"></i></button>
 			</form>
 		</div>
 

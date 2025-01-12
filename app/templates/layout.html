@@ -14,35 +14,41 @@
 	<meta name="description"
 		content="Pomodoro 50 | A web app for time management using the Pomodoro Technique. Stay focused and boost productivity.">
 
-
-	<!-- Optimization -->
+	<!-- Optimization for loading speed -->
 	{% if session["user_id"] %}
-	<script type="speculationrules">
-		{
-			"prefetch": [
-				"urls": [
-					{{ url_for('timer.index') }},
-					{{ url_for('insights.index') }},
-					{{ url_for('history.index') }},
-					{{ url_for('settings.index') }},
-					{{ url_for('about.index') }}
-				]
-				"eagerness": "eager"
-			]
-		}
-	</script>
-	{% endif %}
 	<script type="speculationrules">
 		{
 			"prerender": [
 				{
-					"urls": [{{ url_for('home.index') }}],
+					"urls": [
+						"{{ url_for('timer.index') | safe }}",
+						"{{ url_for('insights.index') | safe }}",
+						"{{ url_for('history.index') | safe }}",
+						"{{ url_for('settings.index') | safe }}",
+						"{{ url_for('about.index') | safe }}",
+						"{{ url_for('profile.index') | safe }}",
+					],
 					"eagerness": "moderate"
 				}
 			]
 		}
 	</script>
-
+	{% else %}
+	<script type="speculationrules">
+		{
+			"prerender": [
+				{
+					"urls": [
+						"{{ url_for('signup.index') | safe }}",
+						"{{ url_for('login.index') | safe }}",
+						"{{ url_for('profile.reset_password') | safe }}"
+					],
+					"eagerness": "eager"
+				},
+			]
+		}
+	</script>
+	{% endif %}
 
 	<!-- Open Graph protocols -->
 	<meta property="og:title" content="Pomodoro 50">
@@ -58,37 +64,23 @@
 		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 		crossorigin="anonymous"></script>
 
-
 	<!-- Link to Favicon -->
+	<link rel="icon" type="image/x-icon" href="/static/ico/favicon.ico">
 	<link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
 	<link rel="manifest" href="/static/ico/site.webmanifest">
 
-
 	<!-- Link to Font Awesome v6.0.0 -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-
 	<!-- Link to internal CSS -->
 	<link rel="stylesheet" href="/static/css/styles.css">
-
-
-	<!-- Link to Google Font -->
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap" rel="stylesheet">
-
-
-	<!-- Link to Ionicons v5.5.2 -->
-	<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-
 
 	<!-- Link to Calendar Heatmap -->
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 	<script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
 	<link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
-
 
 	<!-- Link to internal JavaScript -->
 	<script src="/static/js/helpers.js"></script>

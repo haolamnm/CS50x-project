@@ -8,42 +8,43 @@ Sign Up | Pomodoro 50
 <div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
 	<h3 class="text-light">Create Account</h3>
 	<p class="text-secondary text-center mb-3">
-		Create an account so you can start using the app with all its features!
+		Create an account right now and start using Pomodoro 50!
 	</p>
 	<!-- Signup form -->
-	<form action="{{ url_for('signup.index') }}" method="post">
+	<form action="{{ url_for('signup.signup_email') }}" method="post">
 
 		<!-- For Email -->
 		<div class="mb-3 input-group">
-			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+			<span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
 			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email" autofocus
 				type="email" required>
 		</div>
 
 		<!-- For Password -->
 		<div class="mb-3 input-group">
-			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="password"
 				placeholder="Password" type="password" required>
 			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 				onclick="togglePasswordVisibility(this)">
-				<ion-icon name="eye-off"></ion-icon>
+				<i class="fa-solid fa-eye-slash"></i>
 			</button>
 		</div>
 
 		<!-- For Password Confirmation -->
 		<div class="mb-3 input-group">
-			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 			<input autocomplete="off" class="form-control mx-auto w-auto password-toggle" name="confirmation"
 				placeholder="Password (again)" type="password" required>
 			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
 				onclick="togglePasswordVisibility(this)">
-				<ion-icon name="eye-off"></ion-icon>
+				<i class="fa-solid fa-eye-slash"></i>
 			</button>
 		</div>
 
 		<!-- Sign Up Button -->
-		<button class="btn btn-primary mx-auto w-100" type="submit">Sign Up</button>
+		<button class="btn btn-primary mx-auto w-100" type="submit">Sign Up <i
+				class="fa-solid fa-arrow-right-to-bracket"></i></button>
 
 		<div class="container mt-3">
 			<div class="row">
