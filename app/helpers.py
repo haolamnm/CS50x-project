@@ -11,27 +11,6 @@ from flask import flash, redirect, url_for, session, render_template
 load_dotenv()
 
 
-def validate_username(username: str) -> str | None:
-	"""
-	Validate username input and return an error message if invalid, otherwise return None.
-
-	:param username: The username to validate.
-	:return: An error message if the username is invalid, otherwise None.
-	"""
-	username = username.strip().lower()
-	if not username:
-		return 'Username is required'
-	if not username.isalnum():
-		return 'Username must be alphanumeric'
-	if len(username) < 3:
-		return 'Username must be at least 3 characters'
-	if len(username) > 100:
-		return 'Username is too long'
-	if User.query.filter_by(username=username).first():
-		return 'Username is already taken'
-	return None
-
-
 def validate_email(email: str) -> str | None:
 	"""
 	Validate email input and return an error message if invalid, otherwise return None.
@@ -87,9 +66,9 @@ def create_reset_password_email(user: User) -> Message:
 		sender=os.getenv('MAIL_USERNAME'),
 		recipients=[user.email]
 	)
-	reset_url = url_for('main.reset_password_token', token=token, _external=True)
-	msg.body = render_template('emails/reset_password_email.txt', username=user.username, reset_url=reset_url)
-	msg.html = render_template('emails/reset_password_email.html', username=user.username, reset_url=reset_url)
+	reset_url = url_for('profile.reset_password_token', token=token, _external=True)
+	msg.body = render_template('emails/reset_password_email.txt', email=user.email, reset_url=reset_url)
+	msg.html = render_template('emails/reset_password_email.html', email=user.email, reset_url=reset_url)
 	return msg
 
 
@@ -103,7 +82,6 @@ def session_add(user: User, oauth_provider: str = None, oauth_id: str = None) ->
 	:return: None
 	"""
 	session['user_id'] = user.id
-	session['username'] = user.username
 	session['email'] = user.email
 	session['oauth_provider'] = oauth_provider if oauth_provider is not None else user.oauth_provider
 	if oauth_id:
@@ -121,7 +99,7 @@ def login_required(f) -> callable:
     def decorated_function(*args, **kwargs) -> callable:
         if session.get("user_id") is None:
             flash('Please login to access this page', 'warning')
-            return redirect("/login")
+            return redirect(url_for('login.index'))
         return f(*args, **kwargs)
 
     return decorated_function
@@ -137,9 +115,9 @@ def profile_completed_required(f) -> callable:
 	@wraps(f)
 	def decorated_function(*args, **kwargs) -> callable:
 		user = User.query.get(session['user_id'])
-		if user and (user.username is None or user.email is None or user.password is None):
+		if user and (user.email is None or user.password is None):
 			flash('Please complete your profile before proceeding', 'warning')
-			return redirect(url_for('main.profile_complete'))
+			return redirect(url_for('profile.complete_password'))
 		return f(*args, **kwargs)
 
 	return decorated_function
