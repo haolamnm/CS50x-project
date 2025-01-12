@@ -42,10 +42,15 @@ def create_app(config_class: type[Config] = Config) -> Flask:
 	# INFO: Register the blueprints
 	app.register_blueprint(main)
 	app.register_blueprint(home, url_prefix='/')
+	app.register_blueprint(timer, url_prefix='/timer')
+	app.register_blueprint(about, url_prefix='/about')
 	app.register_blueprint(login, url_prefix='/login')
+	app.register_blueprint(signup, url_prefix='/signup')
 	app.register_blueprint(logout, url_prefix='/logout')
 	app.register_blueprint(profile, url_prefix='/profile')
-	app.register_blueprint(signup, url_prefix='/signup')
+	app.register_blueprint(history, url_prefix='/history')
+	app.register_blueprint(insights, url_prefix='/insights')
+	app.register_blueprint(settings, url_prefix='/settings')
 
 	# INFO: Register the error handlers
 	@app.errorhandler(404)
