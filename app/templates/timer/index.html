@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Timer | Pomodoro 50
+{% endblock %}
+
+{% block main %}
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
+	<p class="display-3 display-md-5" id="timer">50:00</p>
+	<button id="toggleButton" class="btn btn-primary">Start</button>
+</div>
+
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3 mt-3">
+	<ul class="nav nav-tabs" role="tablist">
+
+		<!-- Create Task Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active" id="create-task-tab" data-bs-toggle="tab" data-bs-target="#create-task-content"
+				type="button" role="tab">Create Task</button>
+		</li>
+
+		<!-- Remove Task Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="remove-task-tab" data-bs-toggle="tab" data-bs-target="#remove-task-content"
+				type="button" role="tab">Remove Task</button>
+		</li>
+
+		<!-- View Task Tab -->
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="view-task-tab" data-bs-toggle="tab" data-bs-target="#view-task-content" type="button"
+				role="tab">View Task</button>
+		</li>
+	</ul>
+
+	<div class="tab-content mt-3">
+		<div class="tab-pane fade show active" id="create-task-content" role="tabpanel">
+			<form id="create-task-form" onsubmit="createTask(event)">
+				<input class="form-control mb-3" type="text" id="task-title" placeholder="Task title" required>
+				<textarea class="form-control mb-3" id="task-description" placeholder="Task description"></textarea>
+				<button class="btn btn-primary" type="submit">Create</button>
+				<div id="create-task-status"></div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script src="/static/js/task.js"></script>
+<script src="/static/js/timer.js"></script>
+{% endblock %}

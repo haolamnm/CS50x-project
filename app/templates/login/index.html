@@ -1,0 +1,76 @@
+{% extends "/layout.html" %}
+
+{% block title %}
+Log In | Pomodoro 50
+{% endblock %}
+
+{% block main %}
+<div class="container w-100 w-md-50 bg-dark border rounded shadow p-3">
+	<!-- Heading -->
+	<h3 class="text-light">Login here!</h3>
+	<p class="text-secondary text-center mb-3">
+		Welcome back you've been missed! Please log in to continue.
+	</p>
+
+	<!-- Login with email -->
+	<form action="{{ url_for('login.login_email') }}" method="post">
+
+		<!-- Email -->
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="mail"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-autoauto" name="email" placeholder="Email" autofocus
+				autofocus type="email" required>
+		</div>
+
+		<!-- Password -->
+		<div class="mb-3 input-group">
+			<span class="input-group-text"><ion-icon name="lock-closed"></ion-icon></span>
+			<input autocomplete="off" class="form-control mx-auto w-50 password-toggle" name="password" placeholder="Password"
+				type="password" required>
+			<button class="btn btn-outline-secondary input-group-text password-eye" type="button"
+				onclick="togglePasswordVisibility(this)">
+				<ion-icon name="eye-off"></ion-icon>
+			</button>
+		</div>
+
+		<!-- Submit Button -->
+		<button class="btn btn-primary mx-auto w-100" type="submit">Log In</button>
+
+		<!-- Create an account and Forgot password -->
+		<div class="container mt-3">
+			<div class="row">
+				<div class="col-6">
+					<p class="text-start"><a href="{{ url_for('signup.index') }}">Create an account</a></p>
+				</div>
+				<div class="col-6">
+					<p class="text-end"><a href="{{ url_for('profile.reset_password') }}">Forgot your password?</a></p>
+				</div>
+			</div>
+		</div>
+
+	</form>
+
+	<p class="text-center text-secondary mt-3">
+		Or continue with
+	</p>
+
+	<!-- Login with Google+ API -->
+	<form action="{{ url_for('login.login_google') }}" method="get">
+		<div class="mb-3 input-group">
+			<button class="btn btn-outline-danger w-100" type="submit">
+				<ion-icon name="logo-google"></ion-icon> Log In with Google
+			</button>
+		</div>
+	</form>
+
+	<!-- Login with GitHub API -->
+	<form action="{{ url_for('login.login_github') }}" method="get">
+		<div class="mb-3 input-group">
+			<button class="btn btn-outline-light w-100" type="submit">
+				<ion-icon name="logo-github"></ion-icon> Log In with GitHub
+			</button>
+		</div>
+	</form>
+
+</div>
+{% endblock %}

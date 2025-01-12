@@ -16,12 +16,27 @@
 
 
 	<!-- Optimization -->
-	<!-- "/timer", "/insights", "/history", "settings" -->
+	{% if session["user_id"] %}
+	<script type="speculationrules">
+		{
+			"prefetch": [
+				"urls": [
+					{{ url_for('timer.index') }},
+					{{ url_for('insights.index') }},
+					{{ url_for('history.index') }},
+					{{ url_for('settings.index') }},
+					{{ url_for('about.index') }}
+				]
+				"eagerness": "eager"
+			]
+		}
+	</script>
+	{% endif %}
 	<script type="speculationrules">
 		{
 			"prerender": [
 				{
-					"urls": ["/", "/about", "/profile", "/register", "/login", "/reset_password"],
+					"urls": [{{ url_for('home.index') }}],
 					"eagerness": "moderate"
 				}
 			]
@@ -35,7 +50,6 @@
 		content="Pomodoro 50 | A web app for time management using the Pomodoro Technique. Stay focused and boost productivity.">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="https://pomodoro50.vercal.app">
-	<meta property="og:image" content="\static\img\preview.png">
 
 	<!-- Link to Bootstrap v5.3.3 -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -88,7 +102,7 @@
 <body data-bs-theme="dark">
 
 	<!-- Navigation bar section -->
-	<nav class="bg-dark navbar-dark border navbar navbar-expand-md fixed-top" id="navbar">
+	<nav class="bg-dark navbar-dark border navbar navbar-expand-md fixed-top" id="main-navbar">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="/">Pomodoro 50</a>
 			<button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
@@ -98,21 +112,20 @@
 			<div class="collapse navbar-collapse" id="navbar">
 				{% if session["user_id"] %}
 				<ul class="navbar-nav me-auto mt-2">
-					<li class="nav-item"><a class="nav-link" href="/timer">Timer</a></li>
-					<li class="nav-item"><a class="nav-link" href="/insights">Insights</a></li>
-					<li class="nav-item"><a class="nav-link" href="/history">History</a></li>
-					<li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
-					<li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('timer.index') }}">Timer</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('insights.index') }}">Insights</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('history.index') }}">History</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('settings.index') }}">Settings</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('about.index') }}">About</a></li>
 				</ul>
 				<ul class="navbar-nav ms-auto mt-2">
-					<li class="nav-item"><a class="nav-link" href="/profile">{{ session["username"] if
-							session["username"] else "User" }}</a></li>
-					<li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('profile.index') }}">Profile</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('logout.index') }}">Logout</a></li>
 				</ul>
 				{% else %}
 				<ul class="navbar-nav ms-auto mt-2">
-					<li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-					<li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('signup.index') }}">Signup</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('login.index') }}">Login</a></li>
 				</ul>
 				{% endif %}
 			</div>
@@ -121,19 +134,19 @@
 
 
 	<!-- Flash messages section -->
-	{% with messages = get_flashed_messages(with_categories=true) %}
-	{% if messages %}
 	<header class="container">
 		<div id="flash-message">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
 			{% for category, message in messages %}
 			<div class="alert alert-{{ category }} mb-0 text-center" role="alert">
 				{{ message }}
 			</div>
 			{% endfor %}
+			{% endif %}
+			{% endwith %}
 		</div>
 	</header>
-	{% endif %}
-	{% endwith %}
 
 
 	<!-- Main content section -->
@@ -150,8 +163,7 @@
 				<div class="col-md-12 mt-3 text-center">
 					<ul class="list-inline mb-1 fs-6">
 						<li class="list-inline-item">
-							<a class="text-light footer-icon" href="https://www.linkedin.com/in/haolamnm/"
-								target="_blank">
+							<a class="text-light footer-icon" href="https://www.linkedin.com/in/haolamnm/" target="_blank">
 								<i class="fab fa-linkedin"></i>
 							</a>
 						</li>
@@ -176,7 +188,7 @@
 							</a>
 						</li>
 					</ul>
-					<p class="mb-0 text-secondary">© 2024 haolamnm</p>
+					<p class="mb-0 text-secondary">&copy; 2025 Pomodoro 50. All rights reserved.</p>
 				</div>
 			</div>
 		</div>
