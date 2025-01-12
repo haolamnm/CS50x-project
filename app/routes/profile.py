@@ -151,7 +151,6 @@ def reset_password() -> str:
 			return redirect(url_for('profile.reset_password'))
 		else:
 			msg = create_reset_password_email(user)
-			app.logger.info(f'[INFO] Mail object: {mail}')
 			mail.send(msg)
 			flash('Reset email sent', 'success')
 			return redirect(url_for('login.index'))
