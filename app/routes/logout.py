@@ -7,7 +7,6 @@ logout = Blueprint('logout', __name__)
 
 @logout.route('/', methods=['GET'])
 @login_required
-@profile_completed_required
 def index() -> str:
 	"""
 	This function will log the user out and clear the session.
