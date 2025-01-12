@@ -55,5 +55,8 @@ def github_init(oauth: OAuth, app: Flask) -> None:
 	)
 
 
+__all__ = ['db', 'mail', 'oauth', 'session', 'migrate', 'google_init', 'github_init']
+
+
 if __name__ == '__main__':
 	pass
