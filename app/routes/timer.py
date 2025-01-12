@@ -14,4 +14,5 @@ def index() -> str:
 
 	:return: Render the timer template.
 	"""
-	return render_template('timer/index.html')
+	time = '39:00'
+	return render_template('timer/index.html', time=time)
