@@ -13,7 +13,7 @@ class User(db.Model):
 	User model.
 
 	Attributes:
-	- A user has a username, email, password, created date, OAuth provider and OAuth ID.
+	- A user has an email, password, created date, OAuth provider and OAuth ID.
 
 	Relationships:
 	- A user has many tasks.
@@ -26,7 +26,6 @@ class User(db.Model):
 	__tablename__ = 'users'
 
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-	username = db.Column(db.String(100), nullable=True, unique=True)
 	email = db.Column(db.String(100), nullable=False, unique=True)
 	password = db.Column(db.String(255), nullable=True, unique=False)
 	create_time = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False, unique=False)
@@ -38,18 +37,16 @@ class User(db.Model):
 	pomodoro_sessions = db.relationship('PomodoroSession', backref='user', lazy=True)
 
 
-	def __init__(self, username: str, email: str, password: str, oauth_provider: str = 'local', oauth_id: str = None) -> None:
+	def __init__(self, email: str, password: str, oauth_provider: str = 'local', oauth_id: str = None) -> None:
 		"""
 		Create a new user.
 
-		:param username: The username.
 		:param email: The email.
 		:param password: The password.
 		:param oauth_provider: The OAuth provider.
 		:param oauth_id: The OAuth ID.
 		:return: None
 		"""
-		self.username = username
 		self.email = email
 		self.password = password
 		self.oauth_provider = oauth_provider
@@ -88,7 +85,7 @@ class User(db.Model):
 
 		:return: The string representation.
 		"""
-		return f'<User #{self.id}: {self.username} - {self.email} - {self.oauth_provider}>'
+		return f'<User #{self.id}: {self.email} - {self.oauth_provider}>'
 
 
 class Task(db.Model):
