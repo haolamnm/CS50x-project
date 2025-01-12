@@ -1,7 +1,8 @@
 import logging
-from flask import Flask
+from flask import Flask, render_template, flash
 from app.config import Config
 from app.extensions import *
+from app.routes import *
 
 
 def create_app(config_class: type[Config] = Config) -> Flask:
@@ -11,7 +12,7 @@ def create_app(config_class: type[Config] = Config) -> Flask:
 	:param config_class: The configuration class to use.
 	:return: The Flask app instance.
 	"""
-	app = Flask(__name__)
+	app = Flask(__name__, template_folder='templates', static_folder='static')
 	app.config.from_object(config_class)
 
 	# INFO: Initialize extensions
@@ -26,7 +27,6 @@ def create_app(config_class: type[Config] = Config) -> Flask:
 
 	# INFO: Create the database
 	with app.app_context():
-		from app import routes, models, helpers
 		db.create_all()
 		app.logger.info('[INFO] Database created')
 
@@ -39,9 +39,19 @@ def create_app(config_class: type[Config] = Config) -> Flask:
 	app.logger.setLevel(logging.INFO)
 	app.logger.info('[INFO] Flask app successfully started')
 
-	# INFO: Register the main blueprint
-	from app.routes import main as main_blueprint
-	app.register_blueprint(main_blueprint)
+	# INFO: Register the blueprints
+	app.register_blueprint(main)
+	app.register_blueprint(home, url_prefix='/')
+	app.register_blueprint(login, url_prefix='/login')
+	app.register_blueprint(logout, url_prefix='/logout')
+	app.register_blueprint(profile, url_prefix='/profile')
+	app.register_blueprint(signup, url_prefix='/signup')
+
+	# INFO: Register the error handlers
+	@app.errorhandler(404)
+	def page_not_found(e):
+		flash('Page not found', 'danger')
+		return render_template('errors/404.html'), 404
 
 	return app
 
