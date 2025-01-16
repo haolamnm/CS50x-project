@@ -115,7 +115,7 @@ def profile_completed_required(f) -> callable:
 	@wraps(f)
 	def decorated_function(*args, **kwargs) -> callable:
 		user = User.query.get(session['user_id'])
-		if user and (user.email is None or user.password is None):
+		if user and user.password is None:
 			flash('Please complete your profile before proceeding', 'warning')
 			return redirect(url_for('profile.complete_password'))
 		return f(*args, **kwargs)
