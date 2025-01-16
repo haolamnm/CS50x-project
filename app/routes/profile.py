@@ -132,6 +132,11 @@ def complete_password() -> str:
 			flash('Profile completed successfully', 'success')
 			return redirect(url_for('profile.index'))
 
+	user = User.query.get(session['user_id'])
+	if user.password is not None:
+		flash('Profile is already complete', 'info')
+		return redirect(url_for('profile.index'))
+
 	return render_template('profile/complete_password.html')
 
 
