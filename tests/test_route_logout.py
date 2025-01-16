@@ -19,13 +19,12 @@ class TestRouteLogout(TestRouteBase):
         :return: None
         """
         self.login(
-            login_type='username_login',
-            identifier=self.test_username,
+            email=self.test_email,
             password=self.test_password
         )
         response = self.logout()
         self.check_status_code(response, 200)
-        self.check_title(response, 'Home')
+        self.check_title(response, 'Home | Pomodoro 50')
         self.check_flash(response, 'Logged out successfully', 'success')
         self.check_session_absent()
 
