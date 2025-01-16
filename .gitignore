@@ -28,3 +28,4 @@ venv/
 # Logs
 app/logs/*
 !app/logs/.gitkeep
+!app/logs/prompt.txt
