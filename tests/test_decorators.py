@@ -1,9 +1,6 @@
 from unittest import main
 from pytest import mark
-from tests.cases import (
-    LOGIN_REQUIRED_TEST_CASES,
-    INCOMPLETED_PROFILE_TEST_CASES
-)
+from tests.cases import LOGIN_REQUIRED_TEST_CASES
 from tests.bases import TestRouteBase
 
 
@@ -29,7 +26,7 @@ class TestDecorators(TestRouteBase):
                 self.check_status_code(response, 302)
 
                 response = self.get(route, follow_redirects=True)
-                self.check_title(response, 'Log In')
+                self.check_title(response, 'Log In | Pomodoro 50')
                 self.check_flash(response, 'Please login to access this page', 'warning')
                 self.check_session_absent()
 
@@ -42,32 +39,26 @@ class TestDecorators(TestRouteBase):
 
         :return: None
         """
-        for username, email, password in INCOMPLETED_PROFILE_TEST_CASES:
-            with self.subTest(username=username, email=email, password=password):
-                try:
-                    user = self.forced_register(username, email, password)
+        user = self.forced_signup(
+            email=self.test_new_email,
+            password=None,
+        )
+        self.forced_login(user)
 
-                    self.forced_login(user)
+        for route, _ in LOGIN_REQUIRED_TEST_CASES:
+            response = self.get(route)
+            self.check_status_code(response, 302)
+            self.check_redirect_route(response, '/profile/complete/password')
 
-                    for route, _ in LOGIN_REQUIRED_TEST_CASES:
-                        response = self.get(route)
-                        self.check_status_code(response, 302)
-                        self.check_redirect_route(response, '/profile/complete')
+            response = self.get(route, follow_redirects=True)
+            self.check_status_code(response, 200)
+            self.check_title(response, 'Complete Password | Pomodoro 50')
+            self.check_flash(response, 'Please complete your profile before proceeding', 'warning')
 
-                        response = self.get(route, follow_redirects=True)
-                        self.check_status_code(response, 200)
-                        self.check_title(response, 'Profile Completion')
-                        self.check_flash(response, 'Please complete your profile before proceeding', 'warning')
-
-                except Exception as e:
-                    self.forced_rollback()
-                    raise e
-
-                finally:
-                    with self.client.session_transaction() as session:
-                        session.clear()
-                    self.forced_rollback()
-                    self.forced_delete(user)
+        with self.client.session_transaction() as session:
+            session.clear()
+        self.forced_rollback()
+        self.forced_delete(user)
 
 
     def test_profile_completed_requriement_with_completed_profile(self) -> None:
@@ -79,17 +70,16 @@ class TestDecorators(TestRouteBase):
         :return: None
         """
         self.login(
-            login_type='username_login',
-            identifier=self.test_username,
+            email=self.test_email,
             password=self.test_password
         )
-        response = self.get('/profile/complete')
+        response = self.get('/profile/complete/password')
         self.check_status_code(response, 302)
-        self.check_redirect_route(response, '/profile')
+        self.check_redirect_route(response, '/profile/')
 
-        response = self.get('/profile', follow_redirects=True)
+        response = self.get('/profile/', follow_redirects=True)
         self.check_status_code(response, 200)
-        self.check_title(response, 'Profile')
+        self.check_title(response, 'Profile | Pomodoro 50')
         self.check_flash(response, 'Profile is already complete', 'info')
 
 
