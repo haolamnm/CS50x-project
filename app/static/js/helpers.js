@@ -1,35 +1,24 @@
 // Toggle password visibility
 function togglePasswordVisibility(button) {
     var passwordField = button.previousElementSibling;
-    var icon = button.querySelector("ion-icon");
+    var icon = button.querySelector("i");
 
     if (passwordField.type === "password") {
         passwordField.type = "text";
-        icon.setAttribute("name", "eye");
+        icon.setAttribute("class", "fa-solid fa-eye m");
     } else {
         passwordField.type = "password";
-        icon.setAttribute("name", "eye-off");
+        icon.setAttribute("class", "fa-solid fa-eye-slash");
     }
 }
 
 
-// Calculate the layout if flash message is present
-window.addEventListener("load", function() {
-    var navbar = document.getElementById("navbar");
-    var flashMessage = document.getElementById("flash-message");
-    var main = document.getElementById("main");
-
-    if (flashMessage) {
-        var navbarHeight = navbar.offsetHeight + 5;
-
-        flashMessage.style.marginTop = navbarHeight + "px";
-        main.style.marginTop = `calc(6rem - ${navbarHeight}px)`;
-        console.log(flashMessage.style.marginTop);
-
-        setTimeout(function() {
-            flashMessage.style.display = "none";
-            main.style.marginTop = "6rem";
-        }, 10000);
-
-    }
+// Timeout the flash message after 10 seconds, with DOM Loaded
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        var flashMessage = document.getElementById("flash-message");
+        if (flashMessage) {
+            flashMessage.remove();
+        }
+    }, 10000);
 });
