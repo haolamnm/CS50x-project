@@ -31,15 +31,12 @@ class TestRouteBase(TestCase):
         self.client = self.app.test_client()
         db.create_all()
 
-        self.test_username = TEST_USERNAME
         self.test_password = TEST_PASSWORD
         self.test_email = TEST_EMAIL
-        self.test_new_username = TEST_NEW_USERNAME
         self.test_new_password = TEST_NEW_PASSWORD
         self.test_new_email = TEST_NEW_EMAIL
 
         self.test_user = User(
-            username=self.test_username,
             email=self.test_email,
             password=generate_password_hash(self.test_password, salt_length=16)
         )
@@ -61,36 +58,32 @@ class TestRouteBase(TestCase):
         self.app_context.pop()
 
 
-    def register(self, username: str, email: str, password: str, confirmation: str) -> TestResponse:
+    def signup(self, email: str, password: str, confirmation: str) -> TestResponse:
         """
-        Register a new user through the registration route (/register).
+        Register a new user through the registration route.
 
-        :param username: The username of the user
         :param email: The email of the user
         :param password: The password of the user
         :param confirmation: The password confirmation of the user
         :return: The response from the registration route
         """
         data = {
-            'username': username,
             'email': email,
             'password': password,
             'confirmation': confirmation
         }
-        response = self.client.post('/register', data=data, follow_redirects=True)
+        response = self.client.post('/signup/email', data=data, follow_redirects=True)
         return response
 
-    def forced_register(self, username: str, email: str, password: str) -> User:
+    def forced_signup(self, email: str, password: str) -> User:
         """
         Explicitly create a new user in the database.
 
-        :param username: The username of the user
         :param email: The email of the user
         :param password: The password of the user
         :return: The user object
         """
         user = User(
-            username=username,
             email=email,
             password=generate_password_hash(password, salt_length=16) if password else None
         )
@@ -99,24 +92,19 @@ class TestRouteBase(TestCase):
         return user
 
 
-    def login(self, login_type: str, identifier: str, password: str) -> TestResponse:
+    def login(self, email: str, password: str) -> TestResponse:
         """
         Log in the user through the login route (/login).
 
-        :param login_type: The type of login (username_login or email_login)
-        :param identifier: The username or email of the user
+        :param email: The email of the user
         :param password: The password of the user
         :return: The response from the login route
         """
         data = {
-            'login_type': login_type,
+            'email': email,
             'password': password
         }
-        if login_type == 'username_login':
-            data['username'] = identifier
-        elif login_type == 'email_login':
-            data['email'] = identifier
-        response = self.client.post('/login', data=data, follow_redirects=True)
+        response = self.client.post('/login/email', data=data, follow_redirects=True)
         return response
 
     def forced_login(self, user: User) -> None:
@@ -128,7 +116,6 @@ class TestRouteBase(TestCase):
         """
         with self.client.session_transaction() as session:
             session['user_id'] = user.id
-            session['username'] = user.username
             session['email'] = user.email
             session['oauth_provider'] = user.oauth_provider
 
@@ -139,34 +126,42 @@ class TestRouteBase(TestCase):
 
         :return: The response from the logout route
         """
-        response = self.client.get('/logout', follow_redirects=True)
+        response = self.client.get('/logout/', follow_redirects=True)
         return response
 
 
-    def update(self, update_type: str, password: str, new_value: str, new_confirm_value: str = None) -> TestResponse:
+    def update_email(self, new_email: str, password: str) -> TestResponse:
+        """
+        Update user information through the update email route
+
+        :param new_email: The new email of the user
+        :param password: The password of the user
+         :return: The response from the update email route
+        """
+        data = {
+            'new_email': new_email,
+            'password': password
+        }
+        response = self.client.post('/profile/update/email', data=data, follow_redirects=True)
+        return response
+
+
+    def update_password(self, new_password: str, new_confirmation: str, password: str) -> TestResponse:
         """
         Update user information through the update route (/update).
 
-        :param update_type: The type of update (username_update, email_update or password_update)
         :param password: The password of the user
-        :param new_value: The new value to update
-        :param new_confirm_value: The new confirmation value to update
+        :param new_password: The new password to update
+        :param new_confirmation: The new confirmation to update
         :return: The response from the update route
         """
         data = {
-            'update_type': update_type,
+            'new_password': new_password,
+            'new_confirmation': new_confirmation,
             'password': password
         }
-        if update_type == 'username_update':
-            data['new_username'] = new_value
-        elif update_type == 'email_update':
-            data['new_email'] = new_value
-        elif update_type == 'password_update':
-            data['new_password'] = new_value
-            data['new_confirmation'] = new_confirm_value
-        response = self.client.post('/update', data=data, follow_redirects=True)
+        response = self.client.post('/profile/update/password', data=data, follow_redirects=True)
         return response
-
 
     def get(self, route: str, follow_redirects: bool = False) -> TestResponse:
         """
@@ -179,23 +174,19 @@ class TestRouteBase(TestCase):
         return response
 
 
-    def complete_profile(self, username: str = None, password: str = None, confirmation: str = None) -> TestResponse:
+    def complete_password(self, password: str, confirmation: str) -> TestResponse:
         """
         Complete the user profile through the complete profile route (/profile/complete).
 
-        :param username: The username of the user
         :param password: The password of the user
         :param confirmation: The password confirmation of the user
         :return: The response from the complete profile route
         """
-        data = {}
-        if username is not None:
-            data['username'] = username
-        if password is not None:
-            data['password'] = password
-        if confirmation is not None:
-            data['confirmation'] = confirmation
-        response = self.client.post('/profile/complete', data=data, follow_redirects=True)
+        data = {
+            'password': password,
+            'confirmation': confirmation
+        }
+        response = self.client.post('/profile/complete/password', data=data, follow_redirects=True)
         return response
 
 
@@ -220,7 +211,6 @@ class TestRouteBase(TestCase):
         """
         with self.client.session_transaction() as session:
             self.assertEqual(session['user_id'], user.id, 'User ID does not match')
-            self.assertEqual(session['username'], user.username, 'Username does not match')
             self.assertEqual(session['email'], user.email, 'Email does not match')
             self.assertEqual(session['oauth_provider'], oauth_provider, 'OAuth provider does not match')
 
@@ -232,7 +222,6 @@ class TestRouteBase(TestCase):
         """
         with self.client.session_transaction() as session:
             self.assertNotIn('user_id', session, 'User ID exists')
-            self.assertNotIn('username', session, 'Username exists')
             self.assertNotIn('email', session, 'Email exists')
             self.assertNotIn('oauth_provider', session, 'OAuth provider exists')
 
@@ -255,35 +244,26 @@ class TestRouteBase(TestCase):
         :param category: The expected category
         :return: None
         """
-        expected = f'<div class="alert alert-{category} mb-0 text-center" role="alert">\n\t\t\t\t\t\t{message}\n\t\t\t\t\t</div>'
+        expected = f'<div class="alert alert-{category} mb-0 text-center" role="alert">{message}</div>'
         self.assertIn(expected.encode(), response.data, 'Flash message does not match')
 
-    def check_user(self, id: int = None, username: str = None, email: str = None, password: str = None) -> User | None:
+    def check_user(self, email: str = None, password: str = None) -> User | None:
         """
-        Check if the user exists in the database.
-        Then check if the user information matches the expected given information.
-        After that, return the user object if it exists. Otherwise, return None.
+        Take the user id from the session and check if the user exists in the database.
+        Check if the user information matches the expected information.
 
         :param id: The user ID
-        :param username: The username of the user
         :param email: The email of the user
         :param password: The password of the user
         :return: The user object if it exists, None otherwise
         """
-        if id is not None:
-            user = User.query.get(id)
-        elif username is not None:
-            user = User.query.filter_by(username=username).first()
-        elif email is not None:
-            user = User.query.filter_by(email=email).first()
-        else:
-            self.fail('No identifier provided')
-            return None
+        with self.client.session_transaction() as session:
+            id = session['user_id']
+
+        user = User.query.get(id)
 
         self.assertIsNotNone(user, 'User does not exist')
 
-        if username is not None:
-            self.assertEqual(user.username, username, 'Username does not match')
         if email is not None:
             self.assertEqual(user.email, email, 'Email does not match')
         if password is not None:
