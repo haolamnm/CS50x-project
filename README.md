@@ -1,5 +1,12 @@
 # Pomodoro 50
 
+<!-- Thumbnail -->
+
+[![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/haolamnm)
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=flat&logo=paypal&logoColor=white)](https://paypal.me/haolamnm)
+[![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/haolamnm)
+[![GitHub Sponsor](https://img.shields.io/badge/GitHub%20Sponsors-%23121011.svg?style=flat&logo=github&logoColor=white)](https://github.com/sponsors/haolamnm)
+
 First of all, This is my project for CS50x 2024.
 
 Welcome to Pomodoro 50! A Flask web application that helps you manage your study session. The difference between Pomodoro 50 and other Pomodoro timers is that Pomodoro 50 is a 50-minute timer, not a 25-minute timer. Yes, you read that right! I found that 25 minutes is too short for me to focus on my work, so I decided to make a 50-minute timer instead.
@@ -35,6 +42,13 @@ pip install -r requirements.txt
 4. Set the environment variables.
 
 5. Run the application.
+
+Connect to the local session system
+```bash
+python dev.py
+```
+
+Connect to the Redis cache session system
 ```bash
 python run.py
 ```
@@ -42,6 +56,8 @@ python run.py
 ## How to use
 
 Start by create your own account via the [register](https://pomodoro-50.vercel.app/register) page. The UI is pretty straightforward, so you should be able to navigate through the website easily.
+
+<!-- YouTube Video -->
 
 ## Inspiration
 
@@ -66,4 +82,5 @@ Email: [haolamnm.work@gmail.com](mailto:haolamnm.work@gmail.com).
 GitHub: [@haolamnm](https://github.com/haolamnm).
 
 LinkedIn: [@haolamnm](https://www.linkedin.com/in/haolamnm/).
+
 ---
